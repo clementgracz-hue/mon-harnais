@@ -36,6 +36,7 @@ claude --plugin-dir ./mon-harnais
 | `/add-db` | Base PostgreSQL Neon (EU) + Drizzle ORM |
 | `/add-auth` | Connexion / inscription NextAuth v5 (mode admin ou utilisateurs) |
 | `/add-email` | Emails transactionnels via Resend |
+| `/add-ci` | CI GitHub Actions (lint + typecheck + build sur chaque PR/push, merge bloqué si échec) + CD Vercel via git push |
 
 Chaque commande est une procédure stricte dans `commands/`. Le fichier `templates/CLAUDE.template.md` est copié dans chaque projet créé : ce sont les conventions que Claude suivra ensuite à chaque interaction.
 
@@ -47,4 +48,4 @@ Chaque commande est une procédure stricte dans `commands/`. Le fichier `templat
 2. Termine toujours par une étape de vérification (tester, déployer, confirmer).
 3. Ajoute les règles permanentes (sécurité, conventions) en fin de fichier.
 
-Idées de prochaines commandes (voir Hypervibe pour l'inspiration) : `/add-stripe`, `/add-storage`, `/add-i18n`, `/add-domain`, `/seo`, `/security`, `/clean`.
+Idées de prochaines commande
