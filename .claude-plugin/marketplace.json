@@ -1,0 +1,13 @@
+{
+  "name": "mon-harnais",
+  "owner": {
+    "name": "Clément"
+  },
+  "plugins": [
+    {
+      "name": "mon-harnais",
+      "source": "./",
+      "description": "Harnais de création d'apps web full-stack T3 (Next.js, tRPC, Drizzle, Tailwind, shadcn/ui) avec addons modulaires."
+    }
+  ]
+}

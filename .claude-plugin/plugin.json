@@ -1,0 +1,8 @@
+{
+  "name": "mon-harnais",
+  "description": "Harnais de création d'apps web full-stack (T3 : Next.js + tRPC + Drizzle + Tailwind + shadcn/ui, déployé sur Vercel + Neon). Décrivez votre projet, le harnais construit et déploie.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Clément"
+  }
+}
