@@ -7,6 +7,7 @@ const withPWA = withPWAInit({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
+  fallbacks: { document: "/offline" },
   workboxOptions: {
     disableDevLogs: true,
     // Le pense-bête et les courses doivent toujours refléter l'état serveur :

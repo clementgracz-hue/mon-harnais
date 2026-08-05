@@ -23,12 +23,19 @@ import { getIsoWeek } from "@/lib/utils";
 
 type Props = {
   recipeId: string;
-  /** Pré-coche « 100% végétal » quand la recette porte déjà une étiquette végé. */
+  /** Pré-coche « 100% végétal » d'après les ingrédients de la recette. */
   defaultVeg?: boolean;
+  /** Ingrédients d'origine animale détectés, affichés en justification. */
+  blockers?: string[];
   trigger: React.ReactNode;
 };
 
-export function AddToWeekDialog({ recipeId, defaultVeg = false, trigger }: Props) {
+export function AddToWeekDialog({
+  recipeId,
+  defaultVeg = false,
+  blockers = [],
+  trigger,
+}: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [day, setDay] = useState<Day | null>(null);
@@ -100,16 +107,27 @@ export function AddToWeekDialog({ recipeId, defaultVeg = false, trigger }: Props
             })}
           </div>
 
-          <div className="flex items-center gap-3 rounded-lg border p-3">
-            <Checkbox
-              id="veg"
-              checked={veg}
-              onCheckedChange={(checked) => setVeg(checked === true)}
-            />
-            <Label htmlFor="veg" className="flex items-center gap-1.5 text-foreground">
-              <Leaf className="h-4 w-4 text-emerald-600" aria-hidden />
-              Repas 100% végétal
-            </Label>
+          <div className="space-y-2 rounded-lg border p-3">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="veg"
+                checked={veg}
+                onCheckedChange={(checked) => setVeg(checked === true)}
+              />
+              <Label
+                htmlFor="veg"
+                className="flex items-center gap-1.5 text-foreground"
+              >
+                <Leaf className="h-4 w-4 text-emerald-600" aria-hidden />
+                Repas 100% végétal
+              </Label>
+            </div>
+            {blockers.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Produits animaux détectés&nbsp;: {blockers.slice(0, 4).join(", ")}
+                {blockers.length > 4 && "…"}
+              </p>
+            )}
           </div>
 
           {error && (

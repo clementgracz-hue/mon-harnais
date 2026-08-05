@@ -4,6 +4,12 @@ Harnais de création d'apps web pour Claude Code, inspiré de [Hypervibe](https:
 
 Stack imposée : **Next.js (App Router) + TypeScript + tRPC + Drizzle + Tailwind + shadcn/ui**, déployé sur **Vercel** avec base **Neon** (PostgreSQL, EU).
 
+## Applications de ce dépôt
+
+| Dossier | Application |
+| --- | --- |
+| [`menus/`](menus/README.md) | **Menus & Courses** — PWA mobile-first : recettes, planificateur de la semaine, pense-bête temps réel et export de la liste vers le Leclerc Drive (Next.js + Supabase). Root Directory Vercel : `menus`. |
+
 ## Installation
 
 1. Pousser ce dossier sur GitHub (repo public ou privé) :

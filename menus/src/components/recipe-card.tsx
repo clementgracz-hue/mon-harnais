@@ -9,15 +9,18 @@ import { cn, formatDuration } from "@/lib/utils";
 
 const VEG_TAGS = ["végé", "vege", "végétal", "vegetarien", "végétarien"];
 
-/** Une recette est considérée 100% végétale d'après ses étiquettes. */
+/** Repli quand les ingrédients ne sont pas chargés : lecture des étiquettes. */
 export function isVegRecipe(recipe: Pick<Recipe, "tags">) {
   return recipe.tags.some((tag) =>
     VEG_TAGS.some((needle) => tag.toLowerCase().includes(needle)),
   );
 }
 
+/** Recette enrichie du verdict végétal calculé côté serveur. */
+export type RecipeCardData = Recipe & { veg?: boolean };
+
 type Props = {
-  recipe: Recipe;
+  recipe: RecipeCardData;
   className?: string;
   /** Contenu additionnel (bouton d'ajout au menu, jour assigné…). */
   action?: React.ReactNode;
@@ -25,7 +28,7 @@ type Props = {
 
 export function RecipeCard({ recipe, className, action }: Props) {
   const total = (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0);
-  const veg = isVegRecipe(recipe);
+  const veg = recipe.veg ?? isVegRecipe(recipe);
 
   return (
     <article

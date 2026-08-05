@@ -112,6 +112,11 @@ export function Wishlist({ initialItems, initialStaples, author }: Props) {
     await supabase.from("shopping_wishlist").delete().eq("id", id);
   }
 
+  async function clearChecked() {
+    setItems((current) => current.filter((row) => !row.is_checked));
+    await supabase.from("shopping_wishlist").delete().eq("is_checked", true);
+  }
+
   async function toggleStaple(staple: StapleProduct) {
     setStaples((current) =>
       current.map((row) =>
@@ -224,9 +229,14 @@ export function Wishlist({ initialItems, initialStaples, author }: Props) {
 
       {checked.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Déjà pris ({checked.length})
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Déjà pris ({checked.length})
+            </h2>
+            <Button variant="ghost" size="sm" onClick={clearChecked}>
+              <Trash2 className="h-4 w-4" /> Vider
+            </Button>
+          </div>
           <ul className="divide-y rounded-xl border opacity-60">
             {checked.map((item) => (
               <ItemRow

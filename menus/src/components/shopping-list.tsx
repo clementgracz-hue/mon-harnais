@@ -1,10 +1,21 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Check, ClipboardCheck, Copy, RotateCcw } from "lucide-react";
+import { Check, CheckCheck, ClipboardCheck, Copy, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { AISLE_EMOJI } from "@/lib/aisles";
+import { createClient } from "@/lib/supabase/client";
 import {
   consolidate,
   countItems,
@@ -29,12 +40,14 @@ type Props = {
 };
 
 export function ShoppingList({ items, storageKey }: Props) {
+  const router = useRouter();
   const [sources, setSources] = useState<Set<ShoppingSource>>(
     () => new Set(SOURCE_ORDER),
   );
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   // Les cases cochées survivent au rechargement : la saisie sur le Drive se
   // fait souvent en plusieurs fois.
@@ -84,6 +97,31 @@ export function ShoppingList({ items, storageKey }: Props) {
       else next.add(key);
       return next;
     });
+  }
+
+  /**
+   * Fin de courses : le pense-bête est soldé et les récurrents redeviennent
+   * inactifs, pour repartir d'une liste propre la semaine suivante.
+   */
+  async function finishShopping() {
+    setClosing(true);
+    const supabase = createClient();
+
+    await Promise.all([
+      supabase
+        .from("shopping_wishlist")
+        .update({ is_checked: true })
+        .eq("is_checked", false),
+      supabase
+        .from("staple_products")
+        .update({ is_selected: false })
+        .eq("is_selected", true),
+    ]);
+
+    setChecked(new Set());
+    window.localStorage.removeItem(storageKey);
+    setClosing(false);
+    router.refresh();
   }
 
   if (total === 0) {
@@ -220,6 +258,30 @@ export function ShoppingList({ items, storageKey }: Props) {
           </ul>
         </section>
       ))}
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="lg" className="w-full">
+            <CheckCheck className="h-5 w-5" aria-hidden />
+            Courses terminées
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clore les courses ?</DialogTitle>
+            <DialogDescription>
+              Le pense-bête sera soldé et les produits récurrents désactivés, pour
+              repartir d&apos;une liste vide. Les recettes de la semaine ne bougent
+              pas.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={finishShopping} disabled={closing}>
+              {closing ? "En cours…" : "Oui, tout solder"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

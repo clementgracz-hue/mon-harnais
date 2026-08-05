@@ -1,11 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarPlus, ChefHat, Clock, Flame, Leaf } from "lucide-react";
+import { CalendarPlus, ChefHat, Clock, Flame, Leaf, Pencil } from "lucide-react";
 
 import { AddToWeekDialog } from "@/components/add-to-week-dialog";
 import { PageHeader } from "@/components/page-header";
-import { isVegRecipe } from "@/components/recipe-card";
 import { RecipeComments } from "@/components/recipe-comments";
 import { StarRating } from "@/components/star-rating";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +13,7 @@ import { AISLE_EMOJI, aisleRank } from "@/lib/aisles";
 import { createClient } from "@/lib/supabase/server";
 import type { Aisle, RecipeWithDetails } from "@/lib/types/database";
 import { formatDuration } from "@/lib/utils";
+import { deriveVeg } from "@/lib/veg";
 
 export const dynamic = "force-dynamic";
 
@@ -74,11 +74,24 @@ export default async function RecipePage({
     return map;
   }, new Map());
 
-  const veg = isVegRecipe(recipe);
+  // Déduit du rayon des ingrédients : sert de badge et de valeur par défaut
+  // quand la recette est ajoutée à la semaine.
+  const verdict = deriveVeg(ingredients);
+  const veg = verdict.isVeg && ingredients.length > 0;
 
   return (
     <main className="pb-nav">
-      <PageHeader title={recipe.title} backHref="/recettes" />
+      <PageHeader
+        title={recipe.title}
+        backHref="/recettes"
+        action={
+          <Button asChild variant="ghost" size="icon" aria-label="Modifier la recette">
+            <Link href={`/recettes/${recipe.id}/modifier`}>
+              <Pencil className="h-5 w-5 text-muted-foreground" />
+            </Link>
+          </Button>
+        }
+      />
 
       {recipe.image_url && (
         <div className="relative aspect-[16/10] w-full bg-muted">
@@ -140,6 +153,7 @@ export default async function RecipePage({
           <AddToWeekDialog
             recipeId={recipe.id}
             defaultVeg={veg}
+            blockers={verdict.blockers}
             trigger={
               <Button variant="outline" size="lg">
                 <CalendarPlus className="h-5 w-5" aria-hidden />

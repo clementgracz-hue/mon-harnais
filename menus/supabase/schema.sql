@@ -217,6 +217,13 @@ begin
 end
 $$;
 
+-- Privilèges explicites : ne dépend pas des default privileges du projet.
+-- `anon` (visiteur non connecté) ne reçoit rien : l'app exige une session.
+grant usage on schema public to anon, authenticated;
+grant all privileges on all tables in schema public to authenticated;
+grant all privileges on all sequences in schema public to authenticated;
+revoke all privileges on all tables in schema public from anon;
+
 -- ============================================================================
 --  Storage — bucket des photos de recettes (privé, lecture/écriture connectés)
 -- ============================================================================

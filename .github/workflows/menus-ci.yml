@@ -1,0 +1,43 @@
+name: Menus CI
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["menus/**", ".github/workflows/menus-ci.yml"]
+  pull_request:
+    paths: ["menus/**", ".github/workflows/menus-ci.yml"]
+
+concurrency:
+  group: menus-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: menus
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: menus/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      # Le build a besoin des variables publiques Supabase : des valeurs
+      # factices suffisent, aucune requête n'est émise à la compilation.
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key

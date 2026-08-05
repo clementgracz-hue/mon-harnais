@@ -4,12 +4,11 @@ import { useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
 
 import { AddRecipeDialog } from "@/components/add-recipe-dialog";
-import { RecipeCard } from "@/components/recipe-card";
+import { RecipeCard, type RecipeCardData } from "@/components/recipe-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Recipe } from "@/lib/types/database";
 
-export function RecipeList({ recipes }: { recipes: Recipe[] }) {
+export function RecipeList({ recipes }: { recipes: RecipeCardData[] }) {
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
