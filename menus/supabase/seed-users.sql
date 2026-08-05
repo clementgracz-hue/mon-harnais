@@ -6,8 +6,8 @@
 --  « Reset password » (ou « Send magic link »).
 --
 --  Identifiants créés :
---    clementgracz+clement@gmail.com  /  Menus-q3RzAtDqyO   (Clément)
---    clementgracz+mathile@gmail.com  /  Menus-r6yHxjwDXe   (Mathile)
+--    clementgracz+clement@gmail.com   /  Menus-q3RzAtDqyO   (Clément)
+--    clementgracz+mathilde@gmail.com  /  Menus-r6yHxjwDXe   (Mathilde)
 --
 --  Les adresses en « +suffixe » arrivent toutes les deux dans la boîte
 --  clementgracz@gmail.com : pratique pour les mails de réinitialisation.
@@ -28,9 +28,9 @@ declare
       'name',     'Clément'
     ),
     jsonb_build_object(
-      'email',    'clementgracz+mathile@gmail.com',
+      'email',    'clementgracz+mathilde@gmail.com',
       'password', 'Menus-r6yHxjwDXe',
-      'name',     'Mathile'
+      'name',     'Mathilde'
     )
   );
   compte   jsonb;
