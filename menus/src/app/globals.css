@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 160 15% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 15% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 15% 12%;
+    --primary: 160 84% 30%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 20% 95%;
+    --secondary-foreground: 160 20% 20%;
+    --muted: 150 15% 95%;
+    --muted-foreground: 160 8% 45%;
+    --accent: 150 25% 93%;
+    --accent-foreground: 160 20% 20%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 12% 89%;
+    --input: 150 12% 87%;
+    --ring: 160 84% 30%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 160 15% 8%;
+    --foreground: 150 10% 96%;
+    --card: 160 14% 11%;
+    --card-foreground: 150 10% 96%;
+    --popover: 160 14% 11%;
+    --popover-foreground: 150 10% 96%;
+    --primary: 158 64% 45%;
+    --primary-foreground: 160 20% 8%;
+    --secondary: 160 12% 18%;
+    --secondary-foreground: 150 10% 96%;
+    --muted: 160 12% 16%;
+    --muted-foreground: 150 8% 62%;
+    --accent: 160 12% 20%;
+    --accent-foreground: 150 10% 96%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 160 10% 20%;
+    --input: 160 10% 22%;
+    --ring: 158 64% 45%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* PWA installée : pas de sélection accidentelle en scrollant. */
+  @media (display-mode: standalone) {
+    body {
+      overscroll-behavior-y: none;
+    }
+  }
+}
+
+@layer utilities {
+  /* Réserve la hauteur de la barre de navigation + zone sûre iOS. */
+  .pb-nav {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
