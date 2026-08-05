@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { AISLE_EMOJI, aisleRank } from "@/lib/aisles";
 import { createClient } from "@/lib/supabase/server";
 import type { Aisle, RecipeWithDetails } from "@/lib/types/database";
+import { displayName } from "@/lib/user";
 import { formatDuration } from "@/lib/utils";
 import { deriveVeg } from "@/lib/veg";
 
@@ -51,7 +52,7 @@ export default async function RecipePage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const author = user?.email?.split("@")[0] ?? "Nous";
+  const author = displayName(user);
 
   const ingredients = [...recipe.recipe_ingredients].sort(
     (a, b) =>

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
 import { Wishlist } from "@/components/wishlist";
 import { createClient } from "@/lib/supabase/server";
+import { displayName } from "@/lib/user";
 
 export const metadata: Metadata = { title: "Pense-bête" };
 export const dynamic = "force-dynamic";
@@ -32,7 +33,7 @@ export default async function WishlistPage() {
       <Wishlist
         initialItems={items ?? []}
         initialStaples={staples ?? []}
-        author={auth.user?.email?.split("@")[0] ?? "Nous"}
+        author={displayName(auth.user)}
       />
     </main>
   );

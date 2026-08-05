@@ -28,10 +28,22 @@ un visiteur non connecté.
 
 ### 2. Comptes
 
-L'app est privée : toute route hors `/login` passe par le middleware. Créer les
-deux comptes dans **Authentication → Users** (email + mot de passe). Les
-politiques RLS donnent un accès complet à tout utilisateur authentifié — c'est
-volontaire pour une app de couple, à revoir si elle s'ouvre à d'autres foyers.
+L'app est privée : toute route hors `/login` passe par le middleware. Deux
+façons de créer les deux comptes de la maison :
+
+- **Dashboard** — Authentication → Users → *Add user* → *Create new user*, en
+  cochant **Auto Confirm User**. Ajouter `{"name": "Clément"}` dans *User
+  Metadata* pour que le prénom s'affiche comme auteur dans l'app.
+- **SQL** — exécuter `supabase/seed-users.sql` dans SQL Editor : il crée les
+  deux comptes (email confirmé, identité `email`, prénom en métadonnée) avec un
+  mot de passe provisoire. Script rejouable, un compte existant est ignoré.
+
+Dans les deux cas, **changer les mots de passe provisoires** à la première
+connexion (Authentication → Users → *Reset password*).
+
+Les politiques RLS donnent un accès complet à tout utilisateur authentifié —
+c'est volontaire pour une app de couple, à revoir si elle s'ouvre à d'autres
+foyers.
 
 ### 3. Déploiement Vercel
 

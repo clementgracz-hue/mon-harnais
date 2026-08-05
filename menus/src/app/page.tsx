@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/page-header";
 import { WeekPlanner, type MenuEntry } from "@/components/week-planner";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
+import { displayName } from "@/lib/user";
 import { getIsoWeek } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,10 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const supabase = await createClient();
   const { week, year } = getIsoWeek();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: menu } = await supabase
     .from("weekly_menu")
@@ -32,7 +37,7 @@ export default async function HomePage() {
     <main className="pb-nav">
       <PageHeader
         title={`Semaine ${week}`}
-        subtitle={`Nos repas · ${year}`}
+        subtitle={`Nos repas · connecté en ${displayName(user)}`}
         action={
           <form action="/auth/signout" method="post">
             <Button
