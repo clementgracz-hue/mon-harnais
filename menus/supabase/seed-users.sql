@@ -47,7 +47,11 @@ begin
     insert into auth.users (
       instance_id, id, aud, role, email, encrypted_password,
       email_confirmed_at, created_at, updated_at,
-      raw_app_meta_data, raw_user_meta_data
+      raw_app_meta_data, raw_user_meta_data,
+      -- Ces colonnes doivent valoir '' et non NULL : GoTrue les lit comme des
+      -- chaînes non nulles, et un NULL fait échouer la connexion avec
+      -- « Database error querying schema ».
+      confirmation_token, recovery_token, email_change, email_change_token_new
     ) values (
       '00000000-0000-0000-0000-000000000000',
       user_id,
@@ -63,7 +67,8 @@ begin
         'name',       compte->>'name',
         'full_name',  compte->>'name',
         'email',      compte->>'email'
-      )
+      ),
+      '', '', '', ''
     );
 
     -- Sans cette identité, GoTrue refuse la connexion par mot de passe.
@@ -87,6 +92,38 @@ begin
     );
 
     raise notice 'Compte créé : % (%)', compte->>'email', compte->>'name';
+  end loop;
+end
+$$;
+
+-- ---------------------------------------------------------------------------
+--  Réparation — à exécuter aussi sur des comptes déjà créés
+--
+--  GoTrue lit les colonnes de jetons comme des chaînes non nulles. Un compte
+--  inséré en SQL sans les renseigner les laisse à NULL, et toute connexion
+--  échoue alors avec « Database error querying schema ». Les colonnes
+--  n'existent pas toutes selon la version de GoTrue, d'où le test préalable.
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  colonne text;
+  corrigees integer;
+begin
+  foreach colonne in array array[
+    'confirmation_token', 'recovery_token', 'email_change',
+    'email_change_token_new', 'email_change_token_current',
+    'phone_change', 'phone_change_token', 'reauthentication_token'
+  ] loop
+    if exists (
+      select 1 from information_schema.columns
+      where table_schema = 'auth' and table_name = 'users' and column_name = colonne
+    ) then
+      execute format('update auth.users set %I = '''' where %I is null', colonne, colonne);
+      get diagnostics corrigees = row_count;
+      if corrigees > 0 then
+        raise notice 'auth.users.% : % NULL remplacés par une chaîne vide', colonne, corrigees;
+      end if;
+    end if;
   end loop;
 end
 $$;
