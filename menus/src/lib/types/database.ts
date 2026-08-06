@@ -41,6 +41,8 @@ export type Recipe = {
   title: string;
   description: string | null;
   image_url: string | null;
+  /** Lien d'origine de la recette (Jow, blog…). */
+  source_url: string | null;
   prep_time: number | null;
   cook_time: number | null;
   rating: number | null;

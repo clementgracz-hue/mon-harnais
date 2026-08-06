@@ -41,12 +41,16 @@ create table if not exists public.recipes (
   title       text not null,
   description text,
   image_url   text,                                   -- photo (Supabase Storage ou URL externe)
+  source_url  text,                                   -- lien d'origine (Jow, blog…)
   prep_time   integer check (prep_time  >= 0),        -- minutes
   cook_time   integer check (cook_time  >= 0),        -- minutes
   rating      numeric(2,1) check (rating between 0 and 5),  -- moyenne des notes (trigger)
   tags        text[] not null default '{}',           -- ex: {Express, "Végé Soir Enfant", Saison}
   created_at  timestamptz not null default now()
 );
+
+-- Bases créées avant l'ajout de la colonne.
+alter table public.recipes add column if not exists source_url text;
 
 create index if not exists recipes_tags_idx  on public.recipes using gin (tags);
 create index if not exists recipes_title_idx on public.recipes (lower(title));

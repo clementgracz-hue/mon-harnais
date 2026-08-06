@@ -41,6 +41,10 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "images.unsplash.com" },
+      // Photos des recettes importées depuis Jow. Ajouter ici tout autre
+      // domaine source : next/image refuse les hôtes non déclarés.
+      { protocol: "https", hostname: "static.jow.fr" },
+      { protocol: "https", hostname: "*.jow.fr" },
     ],
   },
 };

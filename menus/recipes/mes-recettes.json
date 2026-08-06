@@ -1,0 +1,28 @@
+[
+  {
+    "titre": "Nouilles sautées, courgettes & tomates",
+    "description": "Coline · Jow · 4,4/5 (727 notes) · 246 kcal/portion · Nutri-score B. Pour 2 personnes. Astuce : ajouter des crevettes, du poulet ou du tofu mariné.",
+    "lien": "https://jow.fr/recipes/nouilles-sautees-courgettes-et-tomates-8c666m8wihrq1usb0t4m",
+    "photo": "https://static.jow.fr/1024x1024/patterns/yolk-04-202309.png_merge_recipes/p0kGMg006ZgoBQ.png.jpg",
+    "preparation": 5,
+    "cuisson": 15,
+    "etiquettes": ["Express", "Jow", "Saison"],
+    "ingredients": [
+      { "nom": "Nouilles chinoises (aux œufs)", "quantite": 120, "unite": "g", "rayon": "Épicerie salée" },
+      { "nom": "Tomates cerises", "quantite": 200, "unite": "g" },
+      { "nom": "Courgette", "quantite": 200, "unite": "g" },
+      { "nom": "Sauce soja salée", "quantite": 2, "unite": "c. à s." },
+      { "nom": "Ail", "quantite": 1, "unite": "gousse" },
+      { "nom": "Graines de sésame", "quantite": 1, "unite": "c. à c.", "rayon": "Épicerie salée" },
+      { "nom": "Huile d'olive", "quantite": 2, "unite": "c. à c." }
+    ],
+    "etapes": [
+      "Dans une casserole d'eau bouillante, faites cuire les nouilles selon les instructions du paquet. Égouttez-les en fin de cuisson.",
+      "Lavez puis coupez les courgettes en demi-lunes.",
+      "Faites chauffer un filet d'huile d'olive dans une poêle, sur feu moyen. Ajoutez les courgettes et l'ail râpé. Salez, poivrez et faites-les revenir 5 minutes.",
+      "Ajoutez les tomates cerises et poursuivez la cuisson 4 à 5 minutes.",
+      "Ajoutez les nouilles égouttées et la sauce soja. Faites sauter le tout 2 minutes supplémentaires.",
+      "Servez dans un bol et parsemez de graines de sésame. C'est prêt !"
+    ]
+  }
+]

@@ -16,7 +16,7 @@ const ANIMAL_WORDS = [
   "thon", "anchois", "sardine", "saumon", "crevette", "jambon", "lardon",
   "chorizo", "bacon", "gelatine", "miel", "bouillon de volaille",
   "bouillon de boeuf", "sauce nuoc", "worcestershire", "parmesan", "beurre",
-  "creme", "lait", "fromage", "oeuf", "yaourt", "mozzarella", "feta", "ricotta",
+  "creme", "lait", "fromage", "oeuf", "œuf", "yaourt", "mozzarella", "feta", "ricotta",
 ];
 
 const PLANT_WORDS = [

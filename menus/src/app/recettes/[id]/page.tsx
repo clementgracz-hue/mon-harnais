@@ -1,7 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarPlus, ChefHat, Clock, Flame, Leaf, Pencil } from "lucide-react";
+import {
+  CalendarPlus,
+  ChefHat,
+  Clock,
+  ExternalLink,
+  Flame,
+  Leaf,
+  Pencil,
+} from "lucide-react";
 
 import { AddToWeekDialog } from "@/components/add-to-week-dialog";
 import { PageHeader } from "@/components/page-header";
@@ -142,6 +150,18 @@ export default async function RecipePage({
           <p className="text-sm leading-relaxed text-muted-foreground">
             {recipe.description}
           </p>
+        )}
+
+        {recipe.source_url && (
+          <a
+            href={recipe.source_url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            <ExternalLink className="h-4 w-4" aria-hidden />
+            Voir la recette d&apos;origine
+          </a>
         )}
 
         <div className="grid grid-cols-2 gap-3">

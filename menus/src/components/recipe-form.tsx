@@ -63,6 +63,7 @@ export function RecipeForm({ recipe, onSaved, onCancel }: Props) {
   const [title, setTitle] = useState(recipe?.title ?? "");
   const [description, setDescription] = useState(recipe?.description ?? "");
   const [imageUrl, setImageUrl] = useState<string | null>(recipe?.image_url ?? null);
+  const [sourceUrl, setSourceUrl] = useState(recipe?.source_url ?? "");
   const [prepTime, setPrepTime] = useState(String(recipe?.prep_time ?? ""));
   const [cookTime, setCookTime] = useState(String(recipe?.cook_time ?? ""));
   const [tags, setTags] = useState<string[]>(recipe?.tags ?? []);
@@ -114,6 +115,7 @@ export function RecipeForm({ recipe, onSaved, onCancel }: Props) {
       title: title.trim(),
       description: description.trim() || null,
       image_url: imageUrl,
+      source_url: sourceUrl.trim() || null,
       prep_time: prepTime ? Number(prepTime) : null,
       cook_time: cookTime ? Number(cookTime) : null,
       tags,
@@ -223,6 +225,18 @@ export function RecipeForm({ recipe, onSaved, onCancel }: Props) {
             onChange={(event) => setCookTime(event.target.value)}
           />
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="source">Lien de la recette (Jow, blog…)</Label>
+        <Input
+          id="source"
+          type="url"
+          inputMode="url"
+          value={sourceUrl}
+          onChange={(event) => setSourceUrl(event.target.value)}
+          placeholder="https://jow.fr/recipes/…"
+        />
       </div>
 
       <div className="space-y-1.5">

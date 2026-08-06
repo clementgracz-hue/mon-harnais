@@ -83,8 +83,8 @@ begin
     return;
   end if;
 
-  insert into public.recipes (title, description, image_url, prep_time, cook_time, tags)
-  values (${sql(titre)}, ${sql(recipe.description)}, ${sql(recipe.photo)},
+  insert into public.recipes (title, description, image_url, source_url, prep_time, cook_time, tags)
+  values (${sql(titre)}, ${sql(recipe.description)}, ${sql(recipe.photo)}, ${sql(recipe.lien)},
           ${sql(recipe.preparation ?? null)}, ${sql(recipe.cuisson ?? null)},
           ${sqlArray(recipe.etiquettes)})
   returning id into r;
