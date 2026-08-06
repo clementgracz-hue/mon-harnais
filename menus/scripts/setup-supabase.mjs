@@ -39,15 +39,35 @@ function fail(message) {
   process.exit(1);
 }
 
+/** Panne réseau : DNS bloqué, hors ligne, ou proxy d'un bac à sable. */
+function failOffline(cause) {
+  const proxy = process.env.HTTPS_PROXY ?? process.env.https_proxy;
+  fail(
+    `${API} est injoignable depuis cette machine (${cause}).\n\n` +
+      "  Le script n'a pas atteint le réseau — rien n'a été envoyé.\n" +
+      (proxy
+        ? `  Un proxy est configuré (${proxy}), or fetch() de Node ne l'utilise pas.\n` +
+          "  Relance la commande hors de l'environnement cloisonné.\n\n"
+        : "  Vérifie l'accès :  curl -I https://api.supabase.com\n\n") +
+      "  Sinon, passe par le SQL Editor du dashboard : ouvre supabase/schema.sql\n" +
+      "  puis supabase/seed-users.sql, copie leur contenu, colle, Run.",
+  );
+}
+
 async function api(path, options = {}) {
-  const response = await fetch(`${API}${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  let response;
+  try {
+    response = await fetch(`${API}${path}`, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+  } catch (error) {
+    failOffline(error?.cause?.code ?? error?.code ?? "fetch failed");
+  }
 
   const body = await response.text();
   if (!response.ok) {
