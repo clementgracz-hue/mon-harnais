@@ -33,11 +33,11 @@ export function RecipeCard({ recipe, className, action }: Props) {
   return (
     <article
       className={cn(
-        "group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow active:shadow-none",
+        "group flex items-center overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow active:shadow-none",
         className,
       )}
     >
-      <Link href={`/recettes/${recipe.id}`} className="flex gap-3 p-3">
+      <Link href={`/recettes/${recipe.id}`} className="flex min-w-0 flex-1 gap-3 p-3">
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
           {recipe.image_url ? (
             <Image
@@ -83,7 +83,8 @@ export function RecipeCard({ recipe, className, action }: Props) {
         </div>
       </Link>
 
-      {action && <div className="absolute bottom-2 right-2">{action}</div>}
+      {/* Hors du lien : le bouton doit agir sans ouvrir la fiche. */}
+      {action && <div className="shrink-0 pr-3">{action}</div>}
     </article>
   );
 }

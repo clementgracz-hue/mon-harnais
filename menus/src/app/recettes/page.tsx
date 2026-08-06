@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { Plus } from "lucide-react";
 
+import { AddRecipeDialog } from "@/components/add-recipe-dialog";
 import { PageHeader } from "@/components/page-header";
 import type { RecipeCardData } from "@/components/recipe-card";
 import { RecipeList } from "@/components/recipe-list";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe, RecipeIngredient } from "@/lib/types/database";
+import { getIsoWeek } from "@/lib/utils";
 import { deriveVeg } from "@/lib/veg";
 
 export const metadata: Metadata = { title: "Recettes" };
@@ -16,6 +20,23 @@ type Row = Recipe & {
 
 export default async function RecipesPage() {
   const supabase = await createClient();
+  const { week, year } = getIsoWeek();
+
+  const { data: menu } = await supabase
+    .from("weekly_menu")
+    .select("id")
+    .eq("week_number", week)
+    .eq("year", year)
+    .maybeSingle();
+
+  // Recettes déjà au menu : le bouton d'ajout doit refléter leur état.
+  const { data: entries } = menu
+    ? await supabase
+        .from("weekly_menu_recipes")
+        .select("recipe_id")
+        .eq("menu_id", menu.id)
+    : { data: [] };
+
   const { data } = await supabase
     .from("recipes")
     // Les ingrédients servent uniquement à calculer le badge « 100% végétal ».
@@ -37,8 +58,21 @@ export default async function RecipesPage() {
       <PageHeader
         title="Recettes"
         subtitle={count > 0 ? `${count} recette${count > 1 ? "s" : ""}` : undefined}
+        action={
+          <AddRecipeDialog
+            trigger={
+              <Button size="sm" aria-label="Créer une recette">
+                <Plus className="h-4 w-4" aria-hidden />
+                Créer
+              </Button>
+            }
+          />
+        }
       />
-      <RecipeList recipes={recipes} />
+      <RecipeList
+        recipes={recipes}
+        selectedIds={(entries ?? []).map((entry) => entry.recipe_id)}
+      />
     </main>
   );
 }
