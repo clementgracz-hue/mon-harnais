@@ -57,8 +57,10 @@ const UNIT_TABLE: Record<
   pièce: { dimension: "unité", base: "pièce", factor: 1 },
   pièces: { dimension: "unité", base: "pièce", factor: 1 },
   unité: { dimension: "unité", base: "pièce", factor: 1 },
-  tranche: { dimension: "unité", base: "pièce", factor: 1 },
-  tranches: { dimension: "unité", base: "pièce", factor: 1 },
+  tranche: { dimension: "unité", base: "tranche", factor: 1 },
+  tranches: { dimension: "unité", base: "tranche", factor: 1 },
+  pincée: { dimension: "unité", base: "pincée", factor: 1 },
+  pincées: { dimension: "unité", base: "pincée", factor: 1 },
   gousse: { dimension: "unité", base: "gousse", factor: 1 },
   gousses: { dimension: "unité", base: "gousse", factor: 1 },
   sachet: { dimension: "unité", base: "sachet", factor: 1 },
@@ -109,6 +111,10 @@ function formatAmount(total: number, base: string) {
   } else if (base === "ml" && total >= 1000) {
     value = total / 1000;
     unit = "L";
+  } else if (base === "c. à c." && total >= 3 && total % 3 === 0) {
+    // 12 cuillères à café se lisent mieux en 4 cuillères à soupe.
+    value = total / 3;
+    unit = "c. à s.";
   }
 
   const rounded = round(value);
@@ -117,7 +123,7 @@ function formatAmount(total: number, base: string) {
     : rounded.toFixed(2).replace(/0$/, "").replace(".", ",");
 
   // Unités dénombrables : accord au pluriel ("2 gousses", "3 sachets").
-  const COUNTABLE = ["pièce", "gousse", "sachet", "boîte", "tranche"];
+  const COUNTABLE = ["pièce", "gousse", "sachet", "boîte", "tranche", "pincée"];
   if (COUNTABLE.includes(unit) && rounded > 1) unit = `${unit}s`;
 
   return unit ? `${printed} ${unit}` : printed;

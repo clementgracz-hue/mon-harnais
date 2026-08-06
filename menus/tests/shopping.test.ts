@@ -55,6 +55,41 @@ describe("consolidate", () => {
     assert.deepEqual(sections[0].items[0].amounts, ["2 gousses", "1 pièce"]);
   });
 
+  it("repasse en cuillères à soupe quand le total y correspond", () => {
+    const sections = consolidate([
+      recipeItem("Parmesan râpé", 2, "c. à s.", "Crémerie"),
+      recipeItem("Parmesan râpé", 2, "c. à s.", "Crémerie"),
+    ]);
+
+    assert.deepEqual(sections[0].items[0].amounts, ["4 c. à s."]);
+  });
+
+  it("garde les cuillères à café quand la conversion tomberait juste", () => {
+    const sections = consolidate([
+      recipeItem("Huile d'olive", 2, "c. à c.", "Épicerie salée"),
+      recipeItem("Huile d'olive", 2, "c. à s.", "Épicerie salée"),
+    ]);
+
+    assert.deepEqual(sections[0].items[0].amounts, ["8 c. à c."]);
+  });
+
+  it("ne confond pas une tranche avec une pièce", () => {
+    const sections = consolidate([
+      recipeItem("Jambon blanc", 2, "tranche", "Traiteur & Charcuterie"),
+      recipeItem("Jambon blanc", 2, "tranches", "Traiteur & Charcuterie"),
+    ]);
+
+    assert.deepEqual(sections[0].items[0].amounts, ["4 tranches"]);
+  });
+
+  it("accorde les pincées au pluriel", () => {
+    const sections = consolidate([
+      recipeItem("Fromage râpé", 4, "pincée", "Crémerie"),
+    ]);
+
+    assert.deepEqual(sections[0].items[0].amounts, ["4 pincées"]);
+  });
+
   it("conserve les articles sans quantité", () => {
     const sections = consolidate([
       recipeItem("Sel", null, null, "Épicerie salée"),

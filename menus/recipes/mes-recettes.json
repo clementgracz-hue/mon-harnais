@@ -1,7 +1,7 @@
 [
   {
     "titre": "Nouilles sautées, courgettes & tomates",
-    "description": "Coline · Jow · 4,4/5 (727 notes) · 246 kcal/portion · Nutri-score B. Pour 2 personnes. Astuce : ajouter des crevettes, du poulet ou du tofu mariné.",
+    "description": "Jow · 4,4/5 (727 avis) · 246 kcal/portion · Nutri-score B · pour 2. Astuce : ajouter des crevettes, du poulet ou du tofu mariné.",
     "lien": "https://jow.fr/recipes/nouilles-sautees-courgettes-et-tomates-8c666m8wihrq1usb0t4m",
     "photo": "https://static.jow.fr/1024x1024/patterns/yolk-04-202309.png_merge_recipes/p0kGMg006ZgoBQ.png.jpg",
     "preparation": 5,
@@ -22,7 +22,106 @@
       "Faites chauffer un filet d'huile d'olive dans une poêle, sur feu moyen. Ajoutez les courgettes et l'ail râpé. Salez, poivrez et faites-les revenir 5 minutes.",
       "Ajoutez les tomates cerises et poursuivez la cuisson 4 à 5 minutes.",
       "Ajoutez les nouilles égouttées et la sauce soja. Faites sauter le tout 2 minutes supplémentaires.",
-      "Servez dans un bol et parsemez de graines de sésame. C'est prêt !"
+      "Servez dans une assiette ou un bol et parsemez de graines de sésame, si vous en avez. C'est prêt !"
+    ]
+  },
+  {
+    "titre": "Pâtes aux petits pois & lardons",
+    "description": "Jow · 4,6/5 (261 avis) · 730 kcal/portion · pour 2.",
+    "lien": "https://jow.fr/recipes/pates-aux-petits-pois-et-lardons-81sxkaju34c000vm1cwp",
+    "photo": "https://static.jow.fr/1024x1024/patterns/yolk-02-202309.png_merge_recipes/jkk2G8R1Rt.png.jpg",
+    "preparation": 2,
+    "cuisson": 10,
+    "etiquettes": ["Express", "Jow", "Plat unique"],
+    "ingredients": [
+      { "nom": "Pâtes (pipe rigate)", "quantite": 200, "unite": "g" },
+      { "nom": "Petits pois frais", "quantite": 200, "unite": "g" },
+      { "nom": "Lardons", "quantite": 150, "unite": "g" },
+      { "nom": "Crème liquide", "quantite": 40, "unite": "ml" },
+      { "nom": "Parmesan râpé", "quantite": 4, "unite": "c. à s." },
+      { "nom": "Menthe fraîche", "quantite": 1, "unite": "bouquet", "rayon": "Fruits & Légumes" }
+    ],
+    "etapes": [
+      "Dans une casserole d'eau bouillante salée, faites cuire les pâtes et les petits pois selon les instructions du paquet. En fin de cuisson, égouttez-les et réservez au chaud.",
+      "Pendant ce temps, dans une poêle chaude, ajoutez les lardons. Faites-les revenir 5 minutes.",
+      "Ajoutez la crème, le parmesan, les petits pois et les pâtes égouttés. Salez, poivrez et mélangez le tout.",
+      "Servez dans une assiette. Parsemez de menthe ciselée, si vous en avez, et de parmesan râpé, s'il vous en reste. Réassaisonnez selon vos goûts. C'est prêt !"
+    ]
+  },
+  {
+    "titre": "Salade lentilles & saumon",
+    "description": "Jow · 4,6/5 (265 avis) · 467 kcal/portion · pour 2.",
+    "lien": "https://jow.fr/recipes/salade-lentilles-et-saumon-8j2261b3kxsgk9wp19zd",
+    "photo": "https://static.jow.fr/1024x1024/patterns/powder-05-202309.png_merge_recipes/ycPxbC2fktZ0kQ.png.jpg",
+    "preparation": 6,
+    "cuisson": 8,
+    "etiquettes": ["Express", "Jow"],
+    "ingredients": [
+      { "nom": "Pavés de saumon frais", "quantite": 2, "unite": "pièce" },
+      { "nom": "Lentilles cuites", "quantite": 400, "unite": "g" },
+      { "nom": "Échalote", "quantite": 1, "unite": "pièce" },
+      { "nom": "Moutarde à l'ancienne", "quantite": 1, "unite": "c. à c." },
+      { "nom": "Vinaigre balsamique", "quantite": 1, "unite": "c. à s." },
+      { "nom": "Huile d'olive", "quantite": 2, "unite": "c. à s." }
+    ],
+    "etapes": [
+      "Si besoin, faites décongeler le saumon. Faites-le cuire dans une poêle bien chaude avec un filet d'huile d'olive.",
+      "Salez et poivrez. Laissez cuire 6 minutes côté peau.",
+      "Pendant ce temps, épluchez puis coupez l'échalote en fines lamelles.",
+      "Réalisez la vinaigrette en mélangeant la moutarde à l'ancienne, le vinaigre balsamique et 1 c. à soupe d'huile d'olive par personne. Salez et poivrez.",
+      "Retournez le saumon et faites cuire 1 minute de chaque côté. Débarrassez-le de la poêle et émiettez-le à l'aide d'une fourchette.",
+      "Déposez les lentilles préalablement égouttées et rincées dans une assiette ou un plat. Ajoutez le saumon émietté et les lamelles d'échalote.",
+      "Arrosez de sauce, mélangez si vous le souhaitez. Salez, poivrez, c'est prêt !"
+    ]
+  },
+  {
+    "titre": "Galette forestière",
+    "description": "Jow · 4,8/5 (1052 avis) · 518 kcal/portion · pour 2.",
+    "lien": "https://jow.fr/recipes/galette-forestiere-7xmx9j2l2rhc03yd0oqv",
+    "photo": "https://static.jow.fr/1024x1024/patterns/kale-03-202309.png_merge_recipes/L80hdPF7LXqQfw.png.jpg",
+    "preparation": 7,
+    "cuisson": 10,
+    "etiquettes": ["Express", "Jow"],
+    "ingredients": [
+      { "nom": "Galettes de sarrasin", "quantite": 2, "unite": "pièce", "rayon": "Crémerie" },
+      { "nom": "Jambon blanc", "quantite": 2, "unite": "tranche" },
+      { "nom": "Fromage râpé", "quantite": 4, "unite": "pincée" },
+      { "nom": "Champignons de Paris frais", "quantite": 160, "unite": "g" },
+      { "nom": "Œufs", "quantite": 2, "unite": "pièce" },
+      { "nom": "Échalote", "quantite": 0.5, "unite": "pièce" },
+      { "nom": "Beurre", "quantite": 2, "unite": "c. à c." }
+    ],
+    "etapes": [
+      "Si vous en avez, épluchez puis émincez finement les échalotes.",
+      "Lavez puis coupez les champignons en fines lamelles.",
+      "Faites fondre une noisette de beurre dans une poêle, sur feu vif. Ajoutez les échalotes et faites-les revenir 2 à 3 minutes, en remuant.",
+      "Ajoutez les champignons et poursuivez la cuisson 5 à 6 minutes, jusqu'à ce que l'eau rendue par les champignons s'évapore totalement. Salez et poivrez. Réservez hors du feu.",
+      "Dans la même poêle, faites fondre une seconde noisette de beurre. Ajoutez la galette de sarrasin.",
+      "Cassez l'œuf au centre de la galette, en faisant attention de ne pas casser le jaune. Parsemez de fromage râpé, puis ajoutez le jambon déchiré en morceaux et les champignons grillés.",
+      "Laissez cuire 3 minutes, sur feu moyen, puis repliez la galette en carré ou en demi-lune. C'est prêt !"
+    ]
+  },
+  {
+    "titre": "Bruschetta parma",
+    "description": "Jow · 4,7/5 (374 avis) · 480 kcal/portion · pour 2. Aucune cuisson.",
+    "lien": "https://jow.fr/recipes/bruschetta-parma-8bqufnlt7p7l0ggk09yc",
+    "photo": "https://static.jow.fr/1024x1024/patterns/beet-05-202309.png_merge_recipes/iBFMY0XR50rGzw.png.jpg",
+    "preparation": 8,
+    "cuisson": 0,
+    "etiquettes": ["Express", "Jow", "Saison"],
+    "ingredients": [
+      { "nom": "Pain de campagne tranché", "quantite": 4, "unite": "tranche" },
+      { "nom": "Mozzarella", "quantite": 100, "unite": "g" },
+      { "nom": "Tomates", "quantite": 300, "unite": "g" },
+      { "nom": "Basilic frais", "quantite": 1, "unite": "bouquet" },
+      { "nom": "Jambon cru", "quantite": 4, "unite": "tranche" },
+      { "nom": "Huile d'olive", "unite": "" }
+    ],
+    "etapes": [
+      "Faites toaster les tranches de pain (au grille-pain ou au four en mode grill).",
+      "Pendant ce temps, lavez puis coupez les tomates en fines lamelles.",
+      "Une fois les tranches de pain toastées, ajoutez les tomates, quelques morceaux de mozzarella, le jambon, salez, poivrez, puis ajoutez un filet d'huile d'olive sur le dessus. C'est prêt !",
+      "Optionnel : ajoutez quelques feuilles de basilic si vous en avez."
     ]
   }
 ]
