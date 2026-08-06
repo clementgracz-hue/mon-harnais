@@ -133,3 +133,12 @@ de soja). C'est une proposition : le drapeau reste modifiable sur chaque repas.
 
 La CI GitHub Actions (`.github/workflows/menus-ci.yml`) rejoue lint, typecheck,
 tests et build à chaque push touchant `menus/`.
+
+## Coût
+
+Supabase Free + Vercel Hobby : 0 €. La seule contrainte de l'offre gratuite est
+la mise en pause d'un projet Supabase après ~7 jours **sans aucune requête** —
+un usage normal de l'app suffit à l'éviter. Par sécurité,
+`.github/workflows/supabase-keepalive.yml` envoie un ping hebdomadaire ; il
+suffit de créer les secrets `SUPABASE_URL` et `SUPABASE_ANON_KEY` dans le dépôt
+(sans eux, le job ne fait rien).

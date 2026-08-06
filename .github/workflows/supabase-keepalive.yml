@@ -1,0 +1,41 @@
+name: Supabase keep-alive
+
+# Un projet Supabase sur l'offre gratuite est mis en pause après ~7 jours
+# sans aucune requête. Ce ping hebdomadaire suffit à l'en empêcher.
+#
+# Secrets à créer (Settings > Secrets and variables > Actions) :
+#   SUPABASE_URL       — https://xxxx.supabase.co
+#   SUPABASE_ANON_KEY  — clé « anon public »
+# Sans ces secrets, le job ne fait rien et reste vert.
+#
+# Note GitHub : les workflows planifiés sont désactivés automatiquement après
+# 60 jours sans activité sur le dépôt. Un « Run workflow » manuel les réveille.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # tous les lundis à 6 h UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Réveiller le projet
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ]; then
+            echo "Secrets Supabase absents : rien à pinger pour l'instant."
+            exit 0
+          fi
+
+          status=$(curl -sS -o /dev/null -w '%{http_code}' \
+            --max-time 30 --retry 3 --retry-delay 5 \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL%/}/auth/v1/health")
+
+          echo "GET /auth/v1/health -> HTTP ${status}"
+          test "${status}" = "200"
