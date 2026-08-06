@@ -41,6 +41,20 @@ façons de créer les deux comptes de la maison :
 Dans les deux cas, **changer les mots de passe provisoires** à la première
 connexion (Authentication → Users → *Reset password*).
 
+### 2 bis. Tout installer en une commande (optionnel)
+
+Pour éviter les copier-coller, `scripts/setup-supabase.mjs` envoie `schema.sql`
+puis `seed-users.sql` au projet via l'API Management, et écrit `.env.local` :
+
+```bash
+SUPABASE_ACCESS_TOKEN=sbp_xxx npm run setup:supabase
+```
+
+Le jeton se crée sur https://supabase.com/dashboard/account/tokens ; il n'est
+jamais écrit sur le disque. Ajouter `--dry-run` pour voir ce qui serait envoyé,
+et `SUPABASE_PROJECT_REF=<réf>` si le compte porte plusieurs projets. Les deux
+scripts SQL étant rejouables, relancer la commande est sans risque.
+
 Les politiques RLS donnent un accès complet à tout utilisateur authentifié —
 c'est volontaire pour une app de couple, à revoir si elle s'ouvre à d'autres
 foyers.
