@@ -24,3 +24,6 @@ public/workbox-*.js
 public/workbox-*.js.map
 public/fallback-*.js
 public/swe-worker-*.js
+
+# SQL généré depuis recipes/*.json
+recipes/*.sql

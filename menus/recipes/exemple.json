@@ -1,0 +1,45 @@
+[
+  {
+    "titre": "Dahl de lentilles corail",
+    "description": "Le plat qui passe toujours, même le mercredi soir.",
+    "preparation": 10,
+    "cuisson": 25,
+    "etiquettes": ["Express", "Végé Soir Enfant"],
+    "ingredients": [
+      { "nom": "Lentilles corail", "quantite": 250, "unite": "g" },
+      { "nom": "Lait de coco", "quantite": 40, "unite": "cl" },
+      { "nom": "Oignon", "quantite": 1, "unite": "pièce" },
+      { "nom": "Gingembre frais", "quantite": 1, "unite": "c. à c.", "rayon": "Fruits & Légumes" },
+      { "nom": "Curry", "quantite": 2, "unite": "c. à c." },
+      { "nom": "Tomates pelées", "quantite": 400, "unite": "g" },
+      { "nom": "Riz basmati", "quantite": 300, "unite": "g" }
+    ],
+    "etapes": [
+      "Émincer l'oignon et le faire revenir 5 minutes à l'huile d'olive.",
+      "Ajouter le curry et le gingembre, laisser chauffer 1 minute.",
+      "Verser les lentilles rincées, les tomates et le lait de coco.",
+      "Laisser mijoter 20 minutes à couvert, en remuant de temps en temps.",
+      "Servir avec le riz. Prélever la part du petit avant de saler."
+    ]
+  },
+  {
+    "titre": "Gratin de courgettes au chèvre",
+    "preparation": 15,
+    "cuisson": 35,
+    "etiquettes": ["Four", "Saison"],
+    "ingredients": [
+      { "nom": "Courgettes", "quantite": 800, "unite": "g" },
+      { "nom": "Bûche de chèvre", "quantite": 150, "unite": "g", "rayon": "Crémerie" },
+      { "nom": "Crème fraîche", "quantite": 20, "unite": "cl" },
+      { "nom": "Œufs", "quantite": 2, "unite": "pièce" },
+      { "nom": "Sel", "unite": "" }
+    ],
+    "etapes": [
+      "Préchauffer le four à 200 °C.",
+      "Couper les courgettes en rondelles et les faire revenir 10 minutes.",
+      "Battre les œufs avec la crème, saler légèrement.",
+      "Alterner courgettes et rondelles de chèvre dans un plat, verser l'appareil.",
+      "Enfourner 35 minutes jusqu'à ce que le dessus soit doré."
+    ]
+  }
+]

@@ -8,9 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --import ./tests/alias-hook.mjs --test \"tests/*.test.ts\"",
+    "test": "node --experimental-strip-types --import ./scripts/ts-alias.mjs --test \"tests/*.test.ts\"",
     "icons": "node scripts/generate-icons.mjs",
-    "setup:supabase": "node scripts/setup-supabase.mjs"
+    "setup:supabase": "node scripts/setup-supabase.mjs",
+    "recipes:sql": "node --experimental-strip-types --import ./scripts/ts-alias.mjs scripts/recipes-to-sql.mjs"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
