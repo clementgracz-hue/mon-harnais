@@ -14,6 +14,7 @@ import type {
   StapleProduct,
   WishlistItem,
 } from "@/lib/types/database";
+import { scaleQuantity } from "@/lib/servings";
 import { displayName } from "@/lib/user";
 import { getIsoWeek } from "@/lib/utils";
 
@@ -22,7 +23,9 @@ export const dynamic = "force-dynamic";
 
 type MenuRow = {
   recipes:
-    | (Pick<Recipe, "id" | "title"> & { recipe_ingredients: RecipeIngredient[] })
+    | (Pick<Recipe, "id" | "title" | "servings"> & {
+        recipe_ingredients: RecipeIngredient[];
+      })
     | null;
 };
 
@@ -32,7 +35,7 @@ export default async function ShoppingPage() {
 
   const { data: menu } = await supabase
     .from("weekly_menu")
-    .select("id")
+    .select("id, servings")
     .eq("week_number", week)
     .eq("year", year)
     .maybeSingle();
@@ -42,7 +45,7 @@ export default async function ShoppingPage() {
       menu
         ? supabase
             .from("weekly_menu_recipes")
-            .select("recipes(id, title, recipe_ingredients(*))")
+            .select("recipes(id, title, servings, recipe_ingredients(*))")
             .eq("menu_id", menu.id)
         : Promise.resolve({ data: [] as MenuRow[] }),
       supabase.from("shopping_wishlist").select("*").eq("is_checked", false),
@@ -53,12 +56,20 @@ export default async function ShoppingPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const servings = menu?.servings ?? 2;
+
   // Agrégation : ingrédients des recettes + pense-bête + récurrents cochés.
   const items: RawItem[] = [
     ...((menuRows ?? []) as unknown as MenuRow[]).flatMap((row) =>
       (row.recipes?.recipe_ingredients ?? []).map((ingredient) => ({
         name: ingredient.name,
-        quantity: ingredient.quantity,
+        // Recette écrite pour N parts, panier généré pour le nombre de convives.
+        quantity: scaleQuantity(
+          ingredient.quantity,
+          ingredient.unit,
+          row.recipes?.servings ?? 2,
+          servings,
+        ),
         unit: ingredient.unit,
         aisle: ingredient.aisle_category,
         source: "recette" as const,
@@ -85,7 +96,7 @@ export default async function ShoppingPage() {
     <main className="pb-nav">
       <PageHeader
         title="Liste de courses"
-        subtitle={`Semaine ${week} · prête pour le Drive`}
+        subtitle={`Semaine ${week} · pour ${servings} personne${servings > 1 ? "s" : ""}`}
         action={
           <Button asChild variant="ghost" size="icon" aria-label="Historique des courses">
             <Link href="/courses/historique">

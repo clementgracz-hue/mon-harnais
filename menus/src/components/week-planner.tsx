@@ -15,11 +15,9 @@ export type MenuEntry = WeeklyMenuRecipe & { recipes: Recipe | null };
 
 type Props = {
   entries: MenuEntry[];
-  /** 5 à 6 repas visés sur la semaine. */
-  target?: number;
 };
 
-export function WeekPlanner({ entries, target = 6 }: Props) {
+export function WeekPlanner({ entries }: Props) {
   const router = useRouter();
   const [rows, setRows] = useState(entries);
 
@@ -59,39 +57,8 @@ export function WeekPlanner({ entries, target = 6 }: Props) {
     router.refresh();
   }
 
-  const vegCount = rows.filter((row) => row.is_kid_friendly_veg).length;
-
   return (
     <div className="space-y-4 p-4">
-      <div className="rounded-xl border bg-card p-4">
-        <div className="flex items-baseline justify-between">
-          <p className="text-sm text-muted-foreground">Repas planifiés</p>
-          <p className="text-2xl font-bold">
-            {rows.length}
-            <span className="text-base font-normal text-muted-foreground">
-              /{target}
-            </span>
-          </p>
-        </div>
-        <div className="mt-2 flex gap-1">
-          {Array.from({ length: Math.max(target, rows.length) }).map((_, index) => (
-            <span
-              key={index}
-              className={cn(
-                "h-1.5 flex-1 rounded-full",
-                index < rows.length ? "bg-primary" : "bg-muted",
-              )}
-            />
-          ))}
-        </div>
-        {rows.length > 0 && (
-          <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Leaf className="h-3.5 w-3.5 text-emerald-600" aria-hidden />
-            {vegCount} repas 100% végétal sur {rows.length}
-          </p>
-        )}
-      </div>
-
       {rows.length === 0 ? (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <UtensilsCrossed

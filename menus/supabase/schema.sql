@@ -49,8 +49,10 @@ create table if not exists public.recipes (
   created_at  timestamptz not null default now()
 );
 
--- Bases créées avant l'ajout de la colonne.
+-- Bases créées avant l'ajout des colonnes.
 alter table public.recipes add column if not exists source_url text;
+-- Nombre de parts pour lequel les quantités sont écrites (Jow : 2).
+alter table public.recipes add column if not exists servings integer not null default 2;
 
 create index if not exists recipes_tags_idx  on public.recipes using gin (tags);
 create index if not exists recipes_title_idx on public.recipes (lower(title));
@@ -156,12 +158,19 @@ create index if not exists shopping_wishlist_created_idx on public.shopping_wish
 --  6. weekly_menu
 -- ---------------------------------------------------------------------------
 create table if not exists public.weekly_menu (
-  id          uuid primary key default gen_random_uuid(),
-  week_number integer not null check (week_number between 1 and 53),
-  year        integer not null check (year between 2020 and 2100),
-  created_at  timestamptz not null default now(),
+  id             uuid primary key default gen_random_uuid(),
+  week_number    integer not null check (week_number between 1 and 53),
+  year           integer not null check (year between 2020 and 2100),
+  -- Convives à table : les quantités du panier sont mises à l'échelle.
+  servings       integer not null default 2 check (servings between 1 and 12),
+  -- Objectif de repas pour la semaine (5 ou 6 en général).
+  target_recipes integer not null default 6 check (target_recipes between 1 and 21),
+  created_at     timestamptz not null default now(),
   unique (year, week_number)
 );
+
+alter table public.weekly_menu add column if not exists servings integer not null default 2;
+alter table public.weekly_menu add column if not exists target_recipes integer not null default 6;
 
 -- ---------------------------------------------------------------------------
 --  7. weekly_menu_recipes
@@ -283,6 +292,29 @@ begin
 end;
 $$;
 
+-- ---------------------------------------------------------------------------
+--  9. pantry_items — le frigo : ce qui est rangé et jusqu'à quand
+--
+--  Rempli au retour du Drive depuis une liste archivée. La date de péremption
+--  sert à ordonner les repas de la semaine et à prévenir avant qu'il ne soit
+--  trop tard.
+-- ---------------------------------------------------------------------------
+create table if not exists public.pantry_items (
+  id             uuid primary key default gen_random_uuid(),
+  name           text not null,
+  aisle_category aisle_category not null default 'Autres',
+  expires_on     date,
+  amount         text,
+  -- Course d'origine, pour ne pas ranger deux fois la même liste.
+  run_id         uuid references public.shopping_runs (id) on delete set null,
+  is_used        boolean not null default false,
+  created_at     timestamptz not null default now()
+);
+
+create index if not exists pantry_items_expiry_idx on public.pantry_items (expires_on)
+  where is_used = false;
+create index if not exists pantry_items_run_idx on public.pantry_items (run_id);
+
 -- ============================================================================
 --  Realtime — le pense-bête, les récurrents et le menu se synchronisent à deux
 -- ============================================================================
@@ -291,6 +323,7 @@ begin
   begin execute 'alter publication supabase_realtime add table public.shopping_wishlist';   exception when duplicate_object then null; end;
   begin execute 'alter publication supabase_realtime add table public.staple_products';     exception when duplicate_object then null; end;
   begin execute 'alter publication supabase_realtime add table public.weekly_menu_recipes'; exception when duplicate_object then null; end;
+  begin execute 'alter publication supabase_realtime add table public.pantry_items';        exception when duplicate_object then null; end;
 end
 $$;
 
@@ -312,6 +345,7 @@ alter table public.weekly_menu_recipes enable row level security;
 alter table public.shopping_runs        enable row level security;
 alter table public.shopping_run_items   enable row level security;
 alter table public.shopping_run_recipes enable row level security;
+alter table public.pantry_items          enable row level security;
 
 do $$
 declare t text;
@@ -319,7 +353,7 @@ begin
   foreach t in array array[
     'recipes','recipe_ingredients','recipe_steps','recipe_comments',
     'staple_products','shopping_wishlist','weekly_menu','weekly_menu_recipes',
-    'shopping_runs','shopping_run_items','shopping_run_recipes'
+    'shopping_runs','shopping_run_items','shopping_run_recipes','pantry_items'
   ] loop
     execute format('drop policy if exists "authenticated_all" on public.%I', t);
     execute format(

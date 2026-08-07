@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Beef, Leaf } from "lucide-react";
+import { Beef, Leaf, Refrigerator } from "lucide-react";
 
 import { ArchivedList } from "@/components/archived-list";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import type {
   ShoppingRun,
@@ -56,6 +57,13 @@ export default async function ArchivedRunPage({
       />
 
       <div className="space-y-6 p-4">
+        <Button asChild size="lg" className="w-full">
+          <Link href={`/courses/historique/${run.id}/rangement`}>
+            <Refrigerator className="h-5 w-5" aria-hidden />
+            Ranger cette livraison au frigo
+          </Link>
+        </Button>
+
         {recipes.length > 0 && (
           <section className="space-y-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

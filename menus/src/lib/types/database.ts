@@ -47,6 +47,8 @@ export type Recipe = {
   cook_time: number | null;
   rating: number | null;
   tags: string[];
+  /** Nombre de parts pour lequel les quantités sont écrites. */
+  servings: number;
   created_at: string;
 };
 
@@ -100,6 +102,10 @@ export type WeeklyMenu = {
   id: string;
   week_number: number;
   year: number;
+  /** Convives à table : met les quantités du panier à l'échelle. */
+  servings: number;
+  /** Objectif de repas pour la semaine. */
+  target_recipes: number;
   created_at: string;
 };
 
@@ -140,6 +146,18 @@ export type ShoppingRunRecipe = {
   title: string;
   day_assigned: Day | null;
   is_kid_friendly_veg: boolean;
+};
+
+export type PantryItem = {
+  id: string;
+  name: string;
+  aisle_category: Aisle;
+  /** `YYYY-MM-DD`, null si la date n'a pas été saisie. */
+  expires_on: string | null;
+  amount: string | null;
+  run_id: string | null;
+  is_used: boolean;
+  created_at: string;
 };
 
 export type RecipeWithDetails = Recipe & {
@@ -202,6 +220,7 @@ export type Database = {
       staple_products: Table<StapleProduct, "name">;
       shopping_wishlist: Table<WishlistItem, "item_name">;
       weekly_menu: Table<WeeklyMenu, "week_number" | "year">;
+      pantry_items: Table<PantryItem, "name">;
       shopping_runs: Table<ShoppingRun, "week_number" | "year">;
       shopping_run_items: Table<
         ShoppingRunItem,
