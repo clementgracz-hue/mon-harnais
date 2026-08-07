@@ -98,7 +98,7 @@ export function ExpiryAlerts({ pantry, recipes, entries }: Props) {
       {recipes.length > 1 && (
         <Button variant="outline" className="w-full" onClick={applySuggestion}>
           <CalendarClock className="h-4 w-4" aria-hidden />
-          Ordonner les repas selon les DLC
+          Réordonner selon les DLC
         </Button>
       )}
 

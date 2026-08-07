@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Plus } from "lucide-react";
+import Link from "next/link";
+import { Plus, ShoppingCart } from "lucide-react";
 
 import { AddRecipeDialog } from "@/components/add-recipe-dialog";
 import { PageHeader } from "@/components/page-header";
 import type { RecipeCardData } from "@/components/recipe-card";
 import { RecipeList } from "@/components/recipe-list";
+import { ServingsSetting } from "@/components/servings-setting";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe, RecipeIngredient } from "@/lib/types/database";
@@ -24,7 +26,7 @@ export default async function RecipesPage() {
 
   const { data: menu } = await supabase
     .from("weekly_menu")
-    .select("id")
+    .select("id, servings")
     .eq("week_number", week)
     .eq("year", year)
     .maybeSingle();
@@ -69,6 +71,17 @@ export default async function RecipesPage() {
           />
         }
       />
+      <div className="space-y-3 px-4 pt-4">
+        <ServingsSetting week={week} year={year} servings={menu?.servings ?? 2} />
+
+        <Button asChild size="lg" className="w-full">
+          <Link href="/courses">
+            <ShoppingCart className="h-5 w-5" aria-hidden />
+            Générer la liste de courses
+          </Link>
+        </Button>
+      </div>
+
       <RecipeList
         recipes={recipes}
         selectedIds={(entries ?? []).map((entry) => entry.recipe_id)}

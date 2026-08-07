@@ -3,23 +3,45 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Beef, Leaf, Plus, Trash2, UtensilsCrossed } from "lucide-react";
+import { Beef, CalendarClock, Leaf, Plus, Trash2, UtensilsCrossed } from "lucide-react";
 
+import { StarRating } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import type { Day, Recipe, WeeklyMenuRecipe } from "@/lib/types/database";
 import { DAYS } from "@/lib/types/database";
+import { formatExpiry } from "@/lib/shelf-life";
 import { cn, formatDuration } from "@/lib/utils";
 
 export type MenuEntry = WeeklyMenuRecipe & { recipes: Recipe | null };
 
 type Props = {
   entries: MenuEntry[];
+  /** DLC la plus proche par recette, et le produit qui l'impose. */
+  urgency: Record<string, { expiresOn: string | null; because: string | null }>;
+  /** Auteur des notes, pour les commentaires enregistrés. */
+  author: string;
 };
 
-export function WeekPlanner({ entries }: Props) {
+export function WeekPlanner({ entries, urgency, author }: Props) {
   const router = useRouter();
   const [rows, setRows] = useState(entries);
+
+  /** Une note vaut un avis : la moyenne de la recette est recalculée en base. */
+  async function rate(entry: MenuEntry, rating: number) {
+    setRows((current) =>
+      current.map((row) =>
+        row.recipe_id === entry.recipe_id && row.recipes
+          ? { ...row, recipes: { ...row.recipes, rating } }
+          : row,
+      ),
+    );
+    const supabase = createClient();
+    await supabase
+      .from("recipe_comments")
+      .insert({ recipe_id: entry.recipe_id, author, rating });
+    router.refresh();
+  }
 
   async function toggleVeg(entry: MenuEntry) {
     const next = !entry.is_kid_friendly_veg;
@@ -95,6 +117,23 @@ export function WeekPlanner({ entries }: Props) {
                       ) ?? "Durée non renseignée"}
                     </p>
                   )}
+
+                  {urgency[entry.recipe_id]?.expiresOn && (
+                    <p className="mt-1 flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+                      <CalendarClock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      <span className="truncate">
+                        {urgency[entry.recipe_id].because} —{" "}
+                        {formatExpiry(urgency[entry.recipe_id].expiresOn!)}
+                      </span>
+                    </p>
+                  )}
+
+                  <StarRating
+                    value={entry.recipes?.rating ?? 0}
+                    onChange={(rating) => rate(entry, rating)}
+                    size="sm"
+                    className="mt-1.5"
+                  />
                 </div>
                 <Button
                   variant="ghost"

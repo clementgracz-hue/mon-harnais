@@ -160,14 +160,50 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
     router.refresh();
   }
 
+  // Les filtres restent visibles en toute circonstance : sans eux, décocher
+  // les trois sources rendrait la liste irrécupérable.
+  const filters = (
+    <div className="flex flex-wrap gap-2">
+      {SOURCE_ORDER.map((source) => {
+        const active = sources.has(source);
+        return (
+          <button
+            key={source}
+            type="button"
+            onClick={() =>
+              setSources((current) => {
+                const next = new Set(current);
+                if (next.has(source)) next.delete(source);
+                else next.add(source);
+                return next;
+              })
+            }
+            aria-pressed={active}
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+              active
+                ? "border-primary bg-primary text-primary-foreground"
+                : "text-muted-foreground",
+            )}
+          >
+            {SOURCE_LABELS[source]}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   if (total === 0) {
+    const everythingHidden = sources.size === 0 && items.length > 0;
     return (
       <div className="space-y-4 p-4">
         {/* Le panier vient d'être vidé : le lien vers l'archive doit rester. */}
         {done && <ClosedNotice runId={done} />}
+        {filters}
         <p className="p-8 text-center text-sm text-muted-foreground">
-          Rien à acheter&nbsp;: ajoute des recettes à la semaine ou des produits au
-          pense-bête.
+          {everythingHidden
+            ? "Aucune source sélectionnée : réactive un filtre ci-dessus."
+            : "Rien à acheter : ajoute des recettes à la semaine ou des produits au pense-bête."}
         </p>
       </div>
     );
@@ -175,34 +211,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
 
   return (
     <div className="space-y-4 p-4">
-      <div className="flex flex-wrap gap-2">
-        {SOURCE_ORDER.map((source) => {
-          const active = sources.has(source);
-          return (
-            <button
-              key={source}
-              type="button"
-              onClick={() =>
-                setSources((current) => {
-                  const next = new Set(current);
-                  if (next.has(source)) next.delete(source);
-                  else next.add(source);
-                  return next;
-                })
-              }
-              aria-pressed={active}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "text-muted-foreground",
-              )}
-            >
-              {SOURCE_LABELS[source]}
-            </button>
-          );
-        })}
-      </div>
+      {filters}
 
       <div className="sticky top-[calc(3.75rem+env(safe-area-inset-top))] z-20 flex items-center gap-2 rounded-xl border bg-background/95 p-3 backdrop-blur">
         <div className="flex-1">

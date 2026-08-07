@@ -45,7 +45,8 @@ export default async function StoragePage({
         <p className="text-sm text-muted-foreground">
           Les dates sont proposées d&apos;après la nature du produit — corrige-les
           avec celles imprimées sur les emballages. Les plus fragiles sont en
-          tête. Ce sont ces dates qui ordonneront les repas de la semaine.
+          tête. À l&apos;enregistrement, les repas de la semaine sont replacés dans
+          l&apos;ordre de ces dates — modifiable ensuite jour par jour.
         </p>
 
         <FridgeForm
