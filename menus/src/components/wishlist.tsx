@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Plus, Trash2, Wifi, WifiOff } from "lucide-react";
 
+import { StaplesManager } from "@/components/staples-manager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AISLE_EMOJI, guessAisle } from "@/lib/aisles";
@@ -129,15 +130,6 @@ export function Wishlist({ initialItems, initialStaples, author }: Props) {
       .eq("id", staple.id);
   }
 
-  async function addStaple() {
-    const name = window.prompt("Nouveau produit récurrent ?")?.trim();
-    if (!name) return;
-    await supabase
-      .from("staple_products")
-      .insert({ name, category: guessAisle(name), is_frequent: true });
-    await refresh();
-  }
-
   const pending = items.filter((item) => !item.is_checked);
   const checked = items.filter((item) => item.is_checked);
   const selectedStaples = staples.filter((staple) => staple.is_selected).length;
@@ -153,7 +145,12 @@ export function Wishlist({ initialItems, initialStaples, author }: Props) {
           aria-label="Ajouter un produit"
           enterKeyHint="done"
         />
-        <Button type="submit" size="icon" aria-label="Ajouter" disabled={!draft.trim()}>
+        <Button
+          type="submit"
+          size="icon"
+          aria-label="Ajouter"
+          disabled={!draft.trim()}
+        >
           <Plus className="h-5 w-5" />
         </Button>
       </form>
@@ -199,31 +196,38 @@ export function Wishlist({ initialItems, initialStaples, author }: Props) {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Fonds de roulement{selectedStaples > 0 && ` (${selectedStaples})`}
           </h2>
-          <Button variant="ghost" size="sm" onClick={addStaple}>
-            <Plus className="h-4 w-4" /> Ajouter
-          </Button>
+          <StaplesManager staples={staples} onChanged={refresh} />
         </div>
         <p className="text-xs text-muted-foreground">
-          Un clic suffit&nbsp;: les produits activés partent dans la liste de courses.
+          Un clic suffit&nbsp;: les produits activés partent dans la liste de
+          courses.
         </p>
         <div className="flex flex-wrap gap-2">
-          {staples.map((staple) => (
-            <button
-              key={staple.id}
-              type="button"
-              onClick={() => toggleStaple(staple)}
-              aria-pressed={staple.is_selected}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-sm transition-colors",
-                staple.is_selected
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "text-muted-foreground",
-              )}
-            >
-              {staple.is_selected && <Check className="h-3.5 w-3.5" aria-hidden />}
-              {staple.name}
-            </button>
-          ))}
+          {[...staples]
+            .sort(
+              (a, b) =>
+                Number(b.is_frequent) - Number(a.is_frequent) ||
+                a.name.localeCompare(b.name, "fr"),
+            )
+            .map((staple) => (
+              <button
+                key={staple.id}
+                type="button"
+                onClick={() => toggleStaple(staple)}
+                aria-pressed={staple.is_selected}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-sm transition-colors",
+                  staple.is_selected
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "text-muted-foreground",
+                )}
+              >
+                {staple.is_selected && (
+                  <Check className="h-3.5 w-3.5" aria-hidden />
+                )}
+                {staple.name}
+              </button>
+            ))}
         </div>
       </section>
 

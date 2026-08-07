@@ -48,6 +48,9 @@ export function ShoppingList({ items, storageKey }: Props) {
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [closingOpen, setClosingOpen] = useState(false);
+  const [closingError, setClosingError] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
 
   // Les cases cochées survivent au rechargement : la saisie sur le Drive se
   // fait souvent en plusieurs fois.
@@ -102,25 +105,45 @@ export function ShoppingList({ items, storageKey }: Props) {
   /**
    * Fin de courses : le pense-bête est soldé et les récurrents redeviennent
    * inactifs, pour repartir d'une liste propre la semaine suivante.
+   * Les recettes de la semaine ne sont pas touchées.
    */
   async function finishShopping() {
     setClosing(true);
     const supabase = createClient();
 
-    await Promise.all([
+    // `select` + `count` : on veut pouvoir dire ce qui a réellement changé.
+    const [wishlist, staples] = await Promise.all([
       supabase
         .from("shopping_wishlist")
         .update({ is_checked: true })
-        .eq("is_checked", false),
+        .eq("is_checked", false)
+        .select("id"),
       supabase
         .from("staple_products")
         .update({ is_selected: false })
-        .eq("is_selected", true),
+        .eq("is_selected", true)
+        .select("id"),
     ]);
+
+    const failure = wishlist.error ?? staples.error;
+    if (failure) {
+      setClosingError(failure.message);
+      setClosing(false);
+      return;
+    }
+
+    const soldes = wishlist.data?.length ?? 0;
+    const desactives = staples.data?.length ?? 0;
 
     setChecked(new Set());
     window.localStorage.removeItem(storageKey);
     setClosing(false);
+    setClosingOpen(false);
+    setDone(
+      soldes + desactives === 0
+        ? "Rien à solder : le pense-bête était déjà vide et aucun récurrent n'était activé."
+        : `Courses closes — ${soldes} article${soldes > 1 ? "s" : ""} du pense-bête soldé${soldes > 1 ? "s" : ""}, ${desactives} récurrent${desactives > 1 ? "s" : ""} désactivé${desactives > 1 ? "s" : ""}.`,
+    );
     router.refresh();
   }
 
@@ -259,7 +282,25 @@ export function ShoppingList({ items, storageKey }: Props) {
         </section>
       ))}
 
-      <Dialog>
+      {done && (
+        <p
+          role="status"
+          className="rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary"
+        >
+          {done}
+        </p>
+      )}
+
+      <Dialog
+        open={closingOpen}
+        onOpenChange={(next) => {
+          setClosingOpen(next);
+          if (next) {
+            setClosingError(null);
+            setDone(null);
+          }
+        }}
+      >
         <DialogTrigger asChild>
           <Button variant="outline" size="lg" className="w-full">
             <CheckCheck className="h-5 w-5" aria-hidden />
@@ -275,6 +316,12 @@ export function ShoppingList({ items, storageKey }: Props) {
               pas.
             </DialogDescription>
           </DialogHeader>
+          {closingError && (
+            <p role="alert" className="text-sm text-destructive">
+              {closingError}
+            </p>
+          )}
+
           <DialogFooter>
             <Button onClick={finishShopping} disabled={closing}>
               {closing ? "En cours…" : "Oui, tout solder"}
