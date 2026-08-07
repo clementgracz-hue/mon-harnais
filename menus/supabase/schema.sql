@@ -179,6 +179,110 @@ create table if not exists public.weekly_menu_recipes (
 
 create index if not exists weekly_menu_recipes_menu_idx on public.weekly_menu_recipes (menu_id);
 
+-- ---------------------------------------------------------------------------
+--  8. shopping_runs — historique des courses passées
+--
+--  Instantané figé : les libellés et quantités sont recopiés en texte, pour
+--  qu'une liste commandée reste consultable même si la recette change ou
+--  disparaît ensuite.
+-- ---------------------------------------------------------------------------
+create table if not exists public.shopping_runs (
+  id          uuid primary key default gen_random_uuid(),
+  week_number integer not null check (week_number between 1 and 53),
+  year        integer not null check (year between 2020 and 2100),
+  item_count  integer not null default 0,
+  closed_by   text,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists shopping_runs_date_idx on public.shopping_runs (created_at desc);
+
+create table if not exists public.shopping_run_items (
+  id             uuid primary key default gen_random_uuid(),
+  run_id         uuid not null references public.shopping_runs (id) on delete cascade,
+  name           text not null,
+  amount         text,                                -- « 300 g », « 2 gousses »
+  aisle_category aisle_category not null default 'Autres',
+  sources        text[] not null default '{}',        -- recette / pense-bête / récurrent
+  position       integer not null default 0
+);
+
+create index if not exists shopping_run_items_run_idx on public.shopping_run_items (run_id, position);
+
+create table if not exists public.shopping_run_recipes (
+  id                  uuid primary key default gen_random_uuid(),
+  run_id              uuid not null references public.shopping_runs (id) on delete cascade,
+  -- La recette peut être supprimée plus tard : le titre reste, le lien saute.
+  recipe_id           uuid references public.recipes (id) on delete set null,
+  title               text not null,
+  day_assigned        text,
+  is_kid_friendly_veg boolean not null default false
+);
+
+create index if not exists shopping_run_recipes_run_idx on public.shopping_run_recipes (run_id);
+
+-- ---------------------------------------------------------------------------
+--  Clôture des courses, en une transaction
+--
+--  Archive la liste et les repas de la semaine, puis vide le panier :
+--  pense-bête soldé, récurrents désactivés, repas de la semaine retirés.
+-- ---------------------------------------------------------------------------
+create or replace function public.close_shopping_run(payload jsonb)
+returns uuid
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+  v_week integer := (payload->>'week')::integer;
+  v_year integer := (payload->>'year')::integer;
+  v_items jsonb  := coalesce(payload->'items', '[]'::jsonb);
+  v_run  uuid;
+  v_menu uuid;
+begin
+  insert into public.shopping_runs (week_number, year, closed_by, item_count)
+  values (v_week, v_year, payload->>'closed_by', jsonb_array_length(v_items))
+  returning id into v_run;
+
+  insert into public.shopping_run_items (run_id, name, amount, aisle_category, sources, position)
+  select
+    v_run,
+    entry.item->>'name',
+    nullif(entry.item->>'amount', ''),
+    -- Un rayon inconnu ne doit pas faire échouer l'archivage.
+    case
+      when entry.item->>'aisle' = any (enum_range(null::aisle_category)::text[])
+        then (entry.item->>'aisle')::aisle_category
+      else 'Autres'
+    end,
+    coalesce(array(select jsonb_array_elements_text(entry.item->'sources')), '{}'),
+    entry.ordinality - 1
+  from jsonb_array_elements(v_items) with ordinality as entry(item, ordinality)
+  where coalesce(entry.item->>'name', '') <> '';
+
+  select id into v_menu
+    from public.weekly_menu
+   where week_number = v_week and year = v_year;
+
+  if v_menu is not null then
+    insert into public.shopping_run_recipes
+      (run_id, recipe_id, title, day_assigned, is_kid_friendly_veg)
+    select v_run, r.id, coalesce(r.title, 'Recette supprimée'),
+           m.day_assigned, m.is_kid_friendly_veg
+      from public.weekly_menu_recipes m
+      left join public.recipes r on r.id = m.recipe_id
+     where m.menu_id = v_menu;
+
+    delete from public.weekly_menu_recipes where menu_id = v_menu;
+  end if;
+
+  update public.shopping_wishlist set is_checked  = true  where is_checked  = false;
+  update public.staple_products   set is_selected = false where is_selected = true;
+
+  return v_run;
+end;
+$$;
+
 -- ============================================================================
 --  Realtime — le pense-bête, les récurrents et le menu se synchronisent à deux
 -- ============================================================================
@@ -205,13 +309,17 @@ alter table public.staple_products     enable row level security;
 alter table public.shopping_wishlist   enable row level security;
 alter table public.weekly_menu         enable row level security;
 alter table public.weekly_menu_recipes enable row level security;
+alter table public.shopping_runs        enable row level security;
+alter table public.shopping_run_items   enable row level security;
+alter table public.shopping_run_recipes enable row level security;
 
 do $$
 declare t text;
 begin
   foreach t in array array[
     'recipes','recipe_ingredients','recipe_steps','recipe_comments',
-    'staple_products','shopping_wishlist','weekly_menu','weekly_menu_recipes'
+    'staple_products','shopping_wishlist','weekly_menu','weekly_menu_recipes',
+    'shopping_runs','shopping_run_items','shopping_run_recipes'
   ] loop
     execute format('drop policy if exists "authenticated_all" on public.%I', t);
     execute format(
@@ -227,6 +335,7 @@ grant usage on schema public to anon, authenticated;
 grant all privileges on all tables in schema public to authenticated;
 grant all privileges on all sequences in schema public to authenticated;
 revoke all privileges on all tables in schema public from anon;
+grant execute on function public.close_shopping_run(jsonb) to authenticated;
 
 -- ============================================================================
 --  Storage — bucket des photos de recettes (privé, lecture/écriture connectés)

@@ -112,6 +112,36 @@ export type WeeklyMenuRecipe = {
   created_at: string;
 };
 
+export type ShoppingRun = {
+  id: string;
+  week_number: number;
+  year: number;
+  item_count: number;
+  closed_by: string | null;
+  created_at: string;
+};
+
+/** Instantané d'un article : libellé et quantité figés en texte. */
+export type ShoppingRunItem = {
+  id: string;
+  run_id: string;
+  name: string;
+  amount: string | null;
+  aisle_category: Aisle;
+  sources: string[];
+  position: number;
+};
+
+export type ShoppingRunRecipe = {
+  id: string;
+  run_id: string;
+  /** Null si la recette a été supprimée depuis. */
+  recipe_id: string | null;
+  title: string;
+  day_assigned: Day | null;
+  is_kid_friendly_veg: boolean;
+};
+
 export type RecipeWithDetails = Recipe & {
   recipe_ingredients: RecipeIngredient[];
   recipe_steps: RecipeStep[];
@@ -172,6 +202,33 @@ export type Database = {
       staple_products: Table<StapleProduct, "name">;
       shopping_wishlist: Table<WishlistItem, "item_name">;
       weekly_menu: Table<WeeklyMenu, "week_number" | "year">;
+      shopping_runs: Table<ShoppingRun, "week_number" | "year">;
+      shopping_run_items: Table<
+        ShoppingRunItem,
+        "run_id" | "name",
+        [
+          {
+            foreignKeyName: "shopping_run_items_run_id_fkey";
+            columns: ["run_id"];
+            isOneToOne: false;
+            referencedRelation: "shopping_runs";
+            referencedColumns: ["id"];
+          },
+        ]
+      >;
+      shopping_run_recipes: Table<
+        ShoppingRunRecipe,
+        "run_id" | "title",
+        [
+          {
+            foreignKeyName: "shopping_run_recipes_run_id_fkey";
+            columns: ["run_id"];
+            isOneToOne: false;
+            referencedRelation: "shopping_runs";
+            referencedColumns: ["id"];
+          },
+        ]
+      >;
       weekly_menu_recipes: Table<
         WeeklyMenuRecipe,
         "menu_id" | "recipe_id",
@@ -188,7 +245,13 @@ export type Database = {
       >;
     };
     Views: Record<string, { Row: Record<string, unknown>; Relationships: [] }>;
-    Functions: Record<string, { Args: Record<string, unknown>; Returns: unknown }>;
+    Functions: {
+      /** Archive la liste puis vide le panier. Renvoie l'identifiant de l'archive. */
+      close_shopping_run: {
+        Args: { payload: unknown };
+        Returns: string;
+      };
+    };
     Enums: {
       aisle_category: Aisle;
     };

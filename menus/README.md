@@ -115,9 +115,16 @@ article, groupé par rayon, sans les articles déjà cochés. Les cases cochées
 gardées en `localStorage` par semaine : la saisie sur le Drive peut se faire en
 plusieurs fois.
 
-**Clôture des courses** — le bouton « Courses terminées » solde le pense-bête et
-désactive les produits récurrents, pour repartir d'une liste vide la semaine
-suivante.
+**Clôture des courses** — « Courses terminées » archive la liste et les repas de
+la semaine, puis vide le panier : pense-bête soldé, récurrents désactivés,
+repas retirés du menu. Le tout dans une seule transaction (`close_shopping_run`
+côté base), donc pas de demi-clôture en cas de coupure.
+
+**Historique** — chaque clôture laisse une archive consultable (`/courses/historique`) :
+la liste commandée et les repas de la semaine, recopiés **en texte figé**. Une
+recette modifiée ou supprimée plus tard ne change pas ce qui a été commandé ;
+son titre reste, seul le lien vers la fiche disparaît. La liste archivée se
+recopie d'un bouton.
 
 **Temps réel** — `shopping_wishlist`, `staple_products` et `weekly_menu_recipes`
 sont publiées via Supabase Realtime : un produit ajouté sur un téléphone apparaît

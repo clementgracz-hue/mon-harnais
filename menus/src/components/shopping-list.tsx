@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Check, CheckCheck, ClipboardCheck, Copy, RotateCcw } from "lucide-react";
@@ -33,13 +34,33 @@ const SOURCE_LABELS: Record<ShoppingSource, string> = {
 
 const SOURCE_ORDER: ShoppingSource[] = ["recette", "pense-bête", "récurrent"];
 
+function ClosedNotice({ runId }: { runId: string }) {
+  return (
+    <div
+      role="status"
+      className="flex items-center justify-between gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary"
+    >
+      <span>Courses closes et archivées.</span>
+      <Link
+        href={`/courses/historique/${runId}`}
+        className="shrink-0 font-semibold underline"
+      >
+        Revoir la liste
+      </Link>
+    </div>
+  );
+}
+
 type Props = {
   items: RawItem[];
   /** Clé de persistance des cases cochées (numéro de semaine). */
   storageKey: string;
+  week: number;
+  year: number;
+  closedBy: string;
 };
 
-export function ShoppingList({ items, storageKey }: Props) {
+export function ShoppingList({ items, storageKey, week, year, closedBy }: Props) {
   const router = useRouter();
   const [sources, setSources] = useState<Set<ShoppingSource>>(
     () => new Set(SOURCE_ORDER),
@@ -103,56 +124,52 @@ export function ShoppingList({ items, storageKey }: Props) {
   }
 
   /**
-   * Fin de courses : le pense-bête est soldé et les récurrents redeviennent
-   * inactifs, pour repartir d'une liste propre la semaine suivante.
-   * Les recettes de la semaine ne sont pas touchées.
+   * Fin de courses : archive la liste et les repas, puis vide le panier
+   * (pense-bête soldé, récurrents désactivés, repas de la semaine retirés).
+   * Tout se joue dans une seule transaction côté base.
    */
   async function finishShopping() {
     setClosing(true);
     const supabase = createClient();
 
-    // `select` + `count` : on veut pouvoir dire ce qui a réellement changé.
-    const [wishlist, staples] = await Promise.all([
-      supabase
-        .from("shopping_wishlist")
-        .update({ is_checked: true })
-        .eq("is_checked", false)
-        .select("id"),
-      supabase
-        .from("staple_products")
-        .update({ is_selected: false })
-        .eq("is_selected", true)
-        .select("id"),
-    ]);
+    // On archive la liste complète, sans le filtre d'affichage en cours.
+    const archived = consolidate(items).flatMap((section) =>
+      section.items.map((item) => ({
+        name: item.name,
+        amount: item.amounts.join(" + "),
+        aisle: section.aisle,
+        sources: item.sources,
+      })),
+    );
 
-    const failure = wishlist.error ?? staples.error;
-    if (failure) {
-      setClosingError(failure.message);
+    const { data, error } = await supabase.rpc("close_shopping_run", {
+      payload: { week, year, closed_by: closedBy, items: archived },
+    });
+
+    if (error) {
+      setClosingError(error.message);
       setClosing(false);
       return;
     }
-
-    const soldes = wishlist.data?.length ?? 0;
-    const desactives = staples.data?.length ?? 0;
 
     setChecked(new Set());
     window.localStorage.removeItem(storageKey);
     setClosing(false);
     setClosingOpen(false);
-    setDone(
-      soldes + desactives === 0
-        ? "Rien à solder : le pense-bête était déjà vide et aucun récurrent n'était activé."
-        : `Courses closes — ${soldes} article${soldes > 1 ? "s" : ""} du pense-bête soldé${soldes > 1 ? "s" : ""}, ${desactives} récurrent${desactives > 1 ? "s" : ""} désactivé${desactives > 1 ? "s" : ""}.`,
-    );
+    setDone(String(data));
     router.refresh();
   }
 
   if (total === 0) {
     return (
-      <p className="p-8 text-center text-sm text-muted-foreground">
-        Rien à acheter&nbsp;: ajoute des recettes à la semaine ou des produits au
-        pense-bête.
-      </p>
+      <div className="space-y-4 p-4">
+        {/* Le panier vient d'être vidé : le lien vers l'archive doit rester. */}
+        {done && <ClosedNotice runId={done} />}
+        <p className="p-8 text-center text-sm text-muted-foreground">
+          Rien à acheter&nbsp;: ajoute des recettes à la semaine ou des produits au
+          pense-bête.
+        </p>
+      </div>
     );
   }
 
@@ -282,14 +299,7 @@ export function ShoppingList({ items, storageKey }: Props) {
         </section>
       ))}
 
-      {done && (
-        <p
-          role="status"
-          className="rounded-xl bg-primary/10 px-4 py-3 text-sm text-primary"
-        >
-          {done}
-        </p>
-      )}
+      {done && <ClosedNotice runId={done} />}
 
       <Dialog
         open={closingOpen}
@@ -311,9 +321,9 @@ export function ShoppingList({ items, storageKey }: Props) {
           <DialogHeader>
             <DialogTitle>Clore les courses ?</DialogTitle>
             <DialogDescription>
-              Le pense-bête sera soldé et les produits récurrents désactivés, pour
-              repartir d&apos;une liste vide. Les recettes de la semaine ne bougent
-              pas.
+              La liste et les repas de la semaine sont archivés, puis le panier
+              est vidé&nbsp;: pense-bête soldé, récurrents désactivés, repas de la
+              semaine retirés. L&apos;archive reste consultable dans l&apos;historique.
             </DialogDescription>
           </DialogHeader>
           {closingError && (

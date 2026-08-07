@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 
+import Link from "next/link";
+import { History } from "lucide-react";
+
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { ShoppingList } from "@/components/shopping-list";
 import { createClient } from "@/lib/supabase/server";
 import type { RawItem } from "@/lib/shopping";
@@ -10,6 +14,7 @@ import type {
   StapleProduct,
   WishlistItem,
 } from "@/lib/types/database";
+import { displayName } from "@/lib/user";
 import { getIsoWeek } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Courses" };
@@ -44,6 +49,10 @@ export default async function ShoppingPage() {
       supabase.from("staple_products").select("*").eq("is_selected", true),
     ]);
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   // Agrégation : ingrédients des recettes + pense-bête + récurrents cochés.
   const items: RawItem[] = [
     ...((menuRows ?? []) as unknown as MenuRow[]).flatMap((row) =>
@@ -77,8 +86,21 @@ export default async function ShoppingPage() {
       <PageHeader
         title="Liste de courses"
         subtitle={`Semaine ${week} · prête pour le Drive`}
+        action={
+          <Button asChild variant="ghost" size="icon" aria-label="Historique des courses">
+            <Link href="/courses/historique">
+              <History className="h-5 w-5 text-muted-foreground" />
+            </Link>
+          </Button>
+        }
       />
-      <ShoppingList items={items} storageKey={`courses-${year}-${week}`} />
+      <ShoppingList
+        items={items}
+        storageKey={`courses-${year}-${week}`}
+        week={week}
+        year={year}
+        closedBy={displayName(user)}
+      />
     </main>
   );
 }
