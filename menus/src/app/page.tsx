@@ -1,67 +1,59 @@
 import Link from "next/link";
-import { History, LogOut } from "lucide-react";
+import { History, LogOut, ShoppingBasket } from "lucide-react";
 
 import { ExpiryAlerts } from "@/components/expiry-alerts";
 import { PageHeader } from "@/components/page-header";
-import { WeekPlanner, type MenuEntry } from "@/components/week-planner";
+import { RunPlanner, type RunMeal } from "@/components/run-planner";
 import { Button } from "@/components/ui/button";
 import { urgencyOf } from "@/lib/planning";
 import { createClient } from "@/lib/supabase/server";
-import type { PantryItem, RecipeIngredient } from "@/lib/types/database";
+import type { PantryItem, ShoppingRun } from "@/lib/types/database";
 import { displayName } from "@/lib/user";
-import { getIsoWeek } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-type EntryRow = MenuEntry & {
-  recipes:
-    | (MenuEntry["recipes"] & {
-        recipe_ingredients: Pick<RecipeIngredient, "name">[];
-      })
-    | null;
+type RunRow = ShoppingRun & {
+  shopping_run_recipes: Array<
+    RunMeal & { recipes: (RunMeal["recipes"] & { recipe_ingredients: { name: string }[] }) | null }
+  >;
 };
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const { week, year } = getIsoWeek();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: menu } = await supabase
-    .from("weekly_menu")
-    .select("*")
-    .eq("week_number", week)
-    .eq("year", year)
+  // La semaine que l'on mange est celle de la dernière commande clôturée —
+  // pas le panier en cours de composition dans l'onglet Recettes.
+  const { data } = await supabase
+    .from("shopping_runs")
+    .select(
+      "*, shopping_run_recipes(*, recipes(title, rating, prep_time, cook_time, recipe_ingredients(name)))",
+    )
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
-  const [{ data: entries }, { data: pantry }] = await Promise.all([
-    menu
-      ? supabase
-          .from("weekly_menu_recipes")
-          .select("*, recipes(*, recipe_ingredients(name))")
-          .eq("menu_id", menu.id)
-          .order("created_at")
-      : Promise.resolve({ data: [] as EntryRow[] }),
-    supabase
-      .from("pantry_items")
-      .select("*")
-      .eq("is_used", false)
-      .not("expires_on", "is", null)
-      .order("expires_on"),
-  ]);
+  const run = data as RunRow | null;
 
-  const rows = (entries ?? []) as unknown as EntryRow[];
+  const { data: pantry } = await supabase
+    .from("pantry_items")
+    .select("*")
+    .eq("is_used", false)
+    .not("expires_on", "is", null)
+    .order("expires_on");
+
   const fridge = (pantry ?? []) as PantryItem[];
+  const meals = run?.shopping_run_recipes ?? [];
 
-  // Ce que le frigo impose : chaque repas avec la liste de ses ingrédients.
-  const plannedRecipes = rows
-    .filter((row) => row.recipes)
-    .map((row) => ({
-      id: row.recipe_id,
-      title: row.recipes!.title,
-      ingredients: (row.recipes!.recipe_ingredients ?? []).map((i) => i.name),
+  const plannedRecipes = meals
+    .filter((meal) => meal.recipe_id && meal.recipes)
+    .map((meal) => ({
+      id: meal.recipe_id!,
+      title: meal.title,
+      ingredients: (meal.recipes!.recipe_ingredients ?? []).map((i) => i.name),
     }));
 
   const urgency = Object.fromEntries(
@@ -71,10 +63,17 @@ export default async function HomePage() {
     ]),
   );
 
+  const orderedOn = run
+    ? new Date(run.created_at).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+      })
+    : null;
+
   return (
     <main className="pb-nav">
       <PageHeader
-        title={`Semaine ${week}`}
+        title={run ? `Semaine ${run.week_number}` : "Semaine"}
         subtitle={`Nos repas · connecté en ${displayName(user)}`}
         action={
           <div className="flex items-center">
@@ -102,19 +101,59 @@ export default async function HomePage() {
         }
       />
 
-      <div className="space-y-4 p-4 pb-0">
-        <ExpiryAlerts
-          pantry={fridge}
-          recipes={plannedRecipes}
-          entries={rows.map((row) => ({ id: row.id, recipe_id: row.recipe_id }))}
-        />
-      </div>
+      {!run ? (
+        <div className="p-8 text-center">
+          <ShoppingBasket
+            className="mx-auto mb-3 h-8 w-8 text-muted-foreground"
+            aria-hidden
+          />
+          <p className="text-sm text-muted-foreground">
+            Aucune commande passée. Choisis tes recettes dans l&apos;onglet
+            Recettes, puis clôture tes courses&nbsp;: les repas s&apos;afficheront
+            ici.
+          </p>
+          <Button asChild className="mt-4">
+            <Link href="/recettes">Choisir des recettes</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4 p-4">
+          {/* La commande dont les repas s'affichent en dessous. */}
+          <Link
+            href={`/courses/historique/${run.id}`}
+            className="flex items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3"
+          >
+            <span className="min-w-0">
+              <span className="block font-semibold">
+                Commande du {orderedOn}
+              </span>
+              <span className="block text-xs text-muted-foreground">
+                Semaine {run.week_number} · {run.item_count} articles ·{" "}
+                {meals.length} repas
+                {run.closed_by && ` · ${run.closed_by}`}
+              </span>
+            </span>
+            <span className="shrink-0 text-sm font-medium text-primary">
+              Voir →
+            </span>
+          </Link>
 
-      <WeekPlanner
-        entries={rows as unknown as MenuEntry[]}
-        urgency={urgency}
-        author={displayName(user)}
-      />
+          <ExpiryAlerts
+            pantry={fridge}
+            recipes={plannedRecipes}
+            meals={meals.map((meal) => ({
+              id: meal.id,
+              recipe_id: meal.recipe_id,
+            }))}
+          />
+
+          <RunPlanner
+            meals={meals as RunMeal[]}
+            urgency={urgency}
+            author={displayName(user)}
+          />
+        </div>
+      )}
     </main>
   );
 }

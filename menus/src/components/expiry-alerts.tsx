@@ -14,15 +14,15 @@ import { cn } from "@/lib/utils";
 type Props = {
   pantry: PantryEntry[];
   recipes: PlannedRecipe[];
-  /** Entrées du menu, pour écrire le jour suggéré. */
-  entries: Array<{ id: string; recipe_id: string }>;
+  /** Repas de la commande, pour y écrire le jour suggéré. */
+  meals: Array<{ id: string; recipe_id: string | null }>;
 };
 
 /**
  * Ce qui périme bientôt, et le bouton qui replace les repas de la semaine
  * dans l'ordre des DLC.
  */
-export function ExpiryAlerts({ pantry, recipes, entries }: Props) {
+export function ExpiryAlerts({ pantry, recipes, meals }: Props) {
   const router = useRouter();
   const alerts = expiringSoon(pantry, recipes);
 
@@ -32,12 +32,12 @@ export function ExpiryAlerts({ pantry, recipes, entries }: Props) {
 
     await Promise.all(
       plan.map((item) => {
-        const entry = entries.find((row) => row.recipe_id === item.recipeId);
-        if (!entry) return Promise.resolve();
+        const meal = meals.find((row) => row.recipe_id === item.recipeId);
+        if (!meal) return Promise.resolve();
         return supabase
-          .from("weekly_menu_recipes")
+          .from("shopping_run_recipes")
           .update({ day_assigned: item.day })
-          .eq("id", entry.id);
+          .eq("id", meal.id);
       }),
     );
 

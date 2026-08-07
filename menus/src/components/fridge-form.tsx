@@ -10,7 +10,6 @@ import { AISLE_EMOJI } from "@/lib/aisles";
 import { suggestDays } from "@/lib/planning";
 import { formatExpiry, shelfLifeDays, suggestExpiry } from "@/lib/shelf-life";
 import { createClient } from "@/lib/supabase/client";
-import { getIsoWeek } from "@/lib/utils";
 import type { ShoppingRunItem } from "@/lib/types/database";
 import { cn } from "@/lib/utils";
 
@@ -88,7 +87,7 @@ export function FridgeForm({
       return;
     }
 
-    await reorderWeek(supabase);
+    await reorderMeals(supabase);
 
     setPending(false);
     router.push("/");
@@ -96,26 +95,16 @@ export function FridgeForm({
   }
 
   /**
-   * Les DLC viennent d'être saisies : les repas de la semaine sont replacés
-   * dans leur ordre, le plus urgent en premier. Les jours restent modifiables
-   * à la main ensuite.
+   * Les DLC viennent d'être saisies : les repas de cette commande sont
+   * replacés dans leur ordre, le plus urgent en premier. Les jours restent
+   * modifiables à la main ensuite.
    */
-  async function reorderWeek(supabase: ReturnType<typeof createClient>) {
-    const { week, year } = getIsoWeek();
-
-    const { data: menu } = await supabase
-      .from("weekly_menu")
-      .select("id")
-      .eq("week_number", week)
-      .eq("year", year)
-      .maybeSingle();
-    if (!menu) return;
-
-    const [{ data: entries }, { data: pantry }] = await Promise.all([
+  async function reorderMeals(supabase: ReturnType<typeof createClient>) {
+    const [{ data: mealRows }, { data: pantry }] = await Promise.all([
       supabase
-        .from("weekly_menu_recipes")
-        .select("id, recipe_id, recipes(title, recipe_ingredients(name))")
-        .eq("menu_id", menu.id),
+        .from("shopping_run_recipes")
+        .select("id, recipe_id, title, recipes(recipe_ingredients(name))")
+        .eq("run_id", runId),
       supabase
         .from("pantry_items")
         .select("id, name, expires_on, is_used")
@@ -123,34 +112,34 @@ export function FridgeForm({
         .not("expires_on", "is", null),
     ]);
 
-    if (!entries?.length || !pantry?.length) return;
+    if (!mealRows?.length || !pantry?.length) return;
 
     type Row = {
       id: string;
-      recipe_id: string;
-      recipes: { title: string; recipe_ingredients: { name: string }[] } | null;
+      recipe_id: string | null;
+      title: string;
+      recipes: { recipe_ingredients: { name: string }[] } | null;
     };
 
-    const planned = (entries as unknown as Row[])
-      .filter((entry) => entry.recipes)
-      .map((entry) => ({
-        id: entry.recipe_id,
-        title: entry.recipes!.title,
-        ingredients: entry.recipes!.recipe_ingredients.map((i) => i.name),
+    const rows = mealRows as unknown as Row[];
+    const planned = rows
+      .filter((row) => row.recipe_id && row.recipes)
+      .map((row) => ({
+        id: row.recipe_id!,
+        title: row.title,
+        ingredients: row.recipes!.recipe_ingredients.map((i) => i.name),
       }));
 
     const plan = suggestDays(planned, pantry);
 
     await Promise.all(
       plan.map((item) => {
-        const entry = (entries as unknown as Row[]).find(
-          (row) => row.recipe_id === item.recipeId,
-        );
-        return entry
+        const row = rows.find((entry) => entry.recipe_id === item.recipeId);
+        return row
           ? supabase
-              .from("weekly_menu_recipes")
+              .from("shopping_run_recipes")
               .update({ day_assigned: item.day })
-              .eq("id", entry.id)
+              .eq("id", row.id)
           : Promise.resolve();
       }),
     );
