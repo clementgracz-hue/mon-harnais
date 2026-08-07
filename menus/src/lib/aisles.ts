@@ -46,10 +46,14 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
   ],
   [
     "Entretien & Maison",
-    ["lessive", "liquide vaisselle", "éponge", "papier toilette", "essuie-tout", "sac poubelle", "nettoyant", "sopalin", "adoucissant"],
+    ["lessive", "liquide vaisselle", "éponge", "papier toilette", "essuie-tout", "sac poubelle", "nettoyant", "sopalin", "adoucissant", "papier cuisson"],
   ],
   ["Boissons", ["jus", "eau", "soda", "bière", "vin", "sirop", "limonade", "cola"]],
   ["Surgelés", ["surgelé", "glace", "poêlée surgelée"]],
+  [
+    "Poissonnerie",
+    ["saumon", "cabillaud", "poisson", "crevette", "moule", "colin", "truite", "lieu noir", "saint-jacques", "noix de saint-jacques"],
+  ],
   [
     "Épicerie salée",
     [
@@ -57,26 +61,50 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "épice", "curry", "cumin", "paprika", "conserve", "tomate pelée", "concentré",
       "lentille", "pois chiche", "quinoa", "semoule", "couscous", "thon", "moutarde",
       "bouillon", "coulis", "lait de coco", "crème de coco", "sauce soja", "boulgour",
-      "haricot rouge", "polenta",
+      "haricot rouge", "polenta", "pesto", "béchamel", "orzo", "blé", "mélange céréales",
+      "olive", "tomate séchée", "houmous", "ketchup", "sauce tomate", "marron",
+      "châtaigne", "chips de légumes", "chips de tortillas", "tortilla", "vin blanc",
+      "graines de sésame", "graines de chia", "pignon de pin", "vinaigre", "crème de balsamique",
     ],
   ],
   [
     "Épicerie sucrée",
-    ["sucre", "chocolat", "café", "thé", "confiture", "miel", "céréales", "biscuit", "levure", "vanille", "compote", "pâte à tartiner"],
+    [
+      "sucre", "chocolat", "café", "thé", "confiture", "miel", "céréales", "biscuit",
+      "levure", "vanille", "compote", "pâte à tartiner", "cacao", "noisette", "noix",
+      "amande", "pistache", "avoine", "corn flakes", "sirop d'érable", "muscade",
+      "cannelle", "flocons",
+    ],
   ],
   [
     "Pain & Pâtisserie",
-    ["pain", "baguette", "brioche", "pâte feuilletée", "pâte brisée", "wrap", "tortilla", "biscotte"],
+    [
+      "pain", "baguette", "brioche", "pâte feuilletée", "pâte brisée", "wrap",
+      "biscotte", "croissant", "feuille de brick", "pain burger", "pain de mie",
+      "pain de campagne",
+    ],
   ],
-  ["Poissonnerie", ["saumon", "cabillaud", "poisson", "crevette", "moule", "colin", "truite", "lieu noir"]],
   [
     "Boucherie & Volaille",
-    ["poulet", "boeuf", "bœuf", "steak", "veau", "porc", "agneau", "dinde", "escalope", "saucisse", "merguez", "haché", "rôti"],
+    [
+      "poulet", "boeuf", "bœuf", "steak", "veau", "porc", "agneau", "dinde",
+      "escalope", "saucisse", "merguez", "haché", "rôti", "chipolata",
+      "filet mignon", "chair à saucisse",
+    ],
   ],
-  ["Traiteur & Charcuterie", ["jambon", "lardon", "chorizo", "pâté", "rillettes", "bacon", "terrine", "saucisson"]],
+  [
+    "Traiteur & Charcuterie",
+    ["jambon", "lardon", "chorizo", "pâté", "rillettes", "bacon", "terrine", "saucisson", "lard", "mortadelle", "allumette", "prosciutto", "tzatziki"],
+  ],
   [
     "Crémerie",
-    ["lait", "beurre", "crème", "yaourt", "fromage", "comté", "gruyère", "mozzarella", "feta", "parmesan", "œuf", "oeuf", "ricotta", "chèvre", "skyr"],
+    [
+      "lait", "beurre", "crème", "yaourt", "fromage", "comté", "gruyère",
+      "mozzarella", "feta", "parmesan", "œuf", "oeuf", "ricotta", "chèvre", "skyr",
+      "burrata", "brie", "reblochon", "raclette", "mont d'or", "rocamadour",
+      "cheddar", "mascarpone", "crottin", "râpé végétal", "ravioles", "ravioli",
+      "crozets", "lasagnes", "galette bretonne", "boisson végétale",
+    ],
   ],
   [
     "Fruits & Légumes",
@@ -87,6 +115,10 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "épinard", "haricot", "haricot vert", "petit pois", "concombre", "avocat",
       "persil", "coriandre", "basilic", "aubergine", "potiron", "courge",
       "poireau", "navet", "radis", "melon", "raisin", "kiwi", "clémentine",
+      "endive", "panais", "patate douce", "potimarron", "butternut", "céleri",
+      "abricot", "nectarine", "pamplemousse", "framboise", "cerise", "rhubarbe",
+      "chou blanc", "chou-fleur", "gingembre", "menthe", "ciboulette", "estragon",
+      "origan", "thym", "herbes de provence", "laitue", "mâche", "roquette",
     ],
   ],
 ];
