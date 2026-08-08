@@ -9,6 +9,7 @@ import {
   Flame,
   Leaf,
   Pencil,
+  Users,
 } from "lucide-react";
 
 import { AddToWeekDialog } from "@/components/add-to-week-dialog";
@@ -129,6 +130,12 @@ export default async function RecipePage({
               Cuisson {formatDuration(recipe.cook_time)}
             </span>
           )}
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="h-4 w-4" aria-hidden />
+            {recipe.is_batch
+              ? `plat entier · ${recipe.servings} parts`
+              : `pour ${recipe.servings} parts`}
+          </span>
           {recipe.rating != null && <StarRating value={recipe.rating} size="sm" />}
         </div>
 

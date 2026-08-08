@@ -11,10 +11,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Moussaka', '637 kcal/portion · Note 4,8/5 (755 avis)', 'https://static.jow.fr/1024x1024/recipes/0MFnCzch8bjfqA.jpg', 'https://jow.fr/recipes/moussaka-8zvt7ixki3zk031107qt',
           17, 40,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -57,10 +58,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Bœuf sauté au chou', '488 kcal/portion · Note 4,5/5 (174 avis)', 'https://static.jow.fr/1024x1024/patterns/powder-02-202309.png_merge_recipes/TOqVEL92jCPeZA.png.jpg', 'https://jow.fr/recipes/boeuf-saute-au-chou-8a1bec1kbyf7ipvn05r0',
           6, 10,
-          2, array['Jow', 'Express'])
+          2, false,
+          array['Jow', 'Express'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -92,10 +94,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Aubergines braisées au porc & riz', '503 kcal/portion · Note 4,5/5 (394 avis)', 'https://static.jow.fr/1024x1024/recipes/HeheyF7sqrK41A.jpg', 'https://jow.fr/recipes/aubergines-braisees-au-porc-et-riz-8i983kndlzb4kl8k0hbv',
           16, 15,
-          2, array['Jow'])
+          2, false,
+          array['Jow'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -137,10 +140,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Feta, légumes rôtis & orzo', '532 kcal/portion · Note 4,6/5 (811 avis)', 'https://static.jow.fr/1024x1024/recipes/tar79gFnsVhHkQ.jpg', 'https://jow.fr/recipes/feta-legumes-rotis-et-orzo-8zle1on1aups02uy0cjw',
           7, 30,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -174,10 +178,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
-  values ('Quiche chèvre épinards', '342 kcal/portion · Note 4,6/5 (1969 avis) · Recette pour 6 parts.', 'https://static.jow.fr/1024x1024/recipes/WgXg1IF7xibdPw.jpg', 'https://jow.fr/recipes/quiche-chevre-epinards-89nzh3fuhktx84vm06ld',
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
+  values ('Quiche chèvre épinards', '342 kcal/portion · Note 4,6/5 (1969 avis) · Plat entier : 6 parts.', 'https://static.jow.fr/1024x1024/recipes/WgXg1IF7xibdPw.jpg', 'https://jow.fr/recipes/quiche-chevre-epinards-89nzh3fuhktx84vm06ld',
           16, 50,
-          6, array['Jow', 'Four'])
+          6, true,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -210,10 +215,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Tarte fine mortadelle, burrata & pistaches', '418 kcal/portion · Note 4,8/5 (193 avis)', 'https://static.jow.fr/1024x1024/recipes/ImGf2LuxU6zphw.jpg', 'https://jow.fr/recipes/tarte-fine-mortadelle-burrata-et-pistaches-95u7iwwjkbk7556h155x',
           9, 25,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -245,10 +251,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Risotto de coquillettes & brocolis', '434 kcal/portion · Note 4,2/5 (179 avis)', 'https://static.jow.fr/1024x1024/recipes/dLbsUquITjdZkw.jpg', 'https://jow.fr/recipes/risotto-de-coquillettes-et-brocolis-93ada5zyh5kw02xx05je',
           7, 24,
-          2, array['Jow'])
+          2, false,
+          array['Jow'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -282,10 +289,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Saint-Jacques poêlées et brocoli', '340 kcal/portion · Note 4,5/5 (160 avis)', 'https://static.jow.fr/1024x1024/patterns/beet-04-202309.png_merge_recipes/l0r9MOKw01Lm6w.png.jpg', 'https://jow.fr/recipes/saint-jacques-poelees-et-brocoli-83t31nax8ihsgaa60xq7',
           7, 15,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -314,10 +322,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Gratin de poireaux, pommes de terre & fromage à raclette', '601 kcal/portion · Note 4,5/5 (635 avis)', 'https://static.jow.fr/1024x1024/recipes/PZ0SRl0YnYfgsw.jpg', 'https://jow.fr/recipes/gratin-de-poireaux-pommes-de-terre-et-fromage-a-raclette-92fe1lfaiojk030l0xvf',
           15, 35,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -353,10 +362,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Saucisses, potatoes au air-fryer & salade', '550 kcal/portion · Note 4,8/5 (76 avis)', 'https://static.jow.fr/1024x1024/recipes/JL4v2NitwFRu3w.jpg', 'https://jow.fr/recipes/saucisses-potatoes-au-air-fryer-et-salade-93656ewri07402sd0n43',
           6, 30,
-          2, array['Jow', 'Air fryer'])
+          2, false,
+          array['Jow', 'Air fryer'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -388,10 +398,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Salade de macaroni', '497 kcal/portion · Note 4,5/5 (103 avis)', 'https://static.jow.fr/1024x1024/recipes/TzMyVbWUeNPhwg.jpg', 'https://jow.fr/recipes/salade-de-macaroni-94352u8xli6pd2cr0oxy',
           6, 12,
-          2, array['Jow', 'Express'])
+          2, false,
+          array['Jow', 'Express'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -424,10 +435,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Haché de veau, carottes rôties & feta', '430 kcal/portion · Note 4,5/5 (128 avis)', 'https://static.jow.fr/1024x1024/recipes/qGxnJ8rcW0xGHQ.jpg', 'https://jow.fr/recipes/hache-de-veau-carottes-roties-et-feta-93zg240j9hu75xiu1dwf',
           9, 20,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -461,10 +473,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Filet mignon à la moutarde, pommes de terre & brocoli', '325 kcal/portion · Note 4,5/5 (558 avis)', 'https://static.jow.fr/1024x1024/recipes/40dZEjt0J0qwNw.jpg', 'https://jow.fr/recipes/filet-mignon-a-la-moutarde-pommes-de-terre-et-brocoli-8tnibc4jkts16cux0nhv',
           6, 45,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -496,10 +509,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Cheeseburger poulet & sauce miel moutarde', '645 kcal/portion · Note 4,6/5 (736 avis)', 'https://static.jow.fr/1024x1024/recipes/KgEZvi6MwMh0dA.jpg', 'https://jow.fr/recipes/cheeseburger-poulet-et-sauce-miel-moutarde-9435cskhli6pd2cr1bn5',
           3, 8,
-          2, array['Jow', 'Express'])
+          2, false,
+          array['Jow', 'Express'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -529,10 +543,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Lasagnes pesto & brocolis', '588 kcal/portion · Note 4,5/5 (472 avis)', 'https://static.jow.fr/1024x1024/recipes/YHjlVB3je0PkdQ.jpg', 'https://jow.fr/recipes/lasagnes-pesto-et-brocolis-8rlpjykf7xnn5djq0m4m',
           12, 44,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -565,10 +580,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Ravioles à la toscane', '622 kcal/portion · Note 4,7/5 (2662 avis)', 'https://static.jow.fr/1024x1024/recipes/SQiYvIFirgqd6Q.jpg', 'https://jow.fr/recipes/ravioles-a-la-toscane-8ekx43augkyoka5t0v68',
           3, 12,
-          2, array['Jow', 'Express'])
+          2, false,
+          array['Jow', 'Express'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -601,10 +617,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Grilled cheese brie & cerise noire', '624 kcal/portion · Note 4,4/5 (524 avis)', 'https://static.jow.fr/1024x1024/patterns/powder-02-202309.png_merge_recipes/D55eWNQChZ6NFQ.png.jpg', 'https://jow.fr/recipes/grilled-cheese-brie-et-cerise-noire-81m063jq2lyo00tg05xs',
           5, 4,
-          2, array['Jow', 'Express'])
+          2, false,
+          array['Jow', 'Express'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -636,10 +653,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Salade endives, avocat & comté', '680 kcal/portion · Note 4,7/5 (1033 avis)', 'https://static.jow.fr/1024x1024/patterns/beet-02-202309.png_merge_recipes/8T6uRJltaWuurA.png.jpg', 'https://jow.fr/recipes/salade-endives-avocat-et-comte-8lf15bnr8rcicvir0y19',
           5, 0,
-          2, array['Jow', 'Express'])
+          2, false,
+          array['Jow', 'Express'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -673,10 +691,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Crème de panais, lard & œufs pochés', '408 kcal/portion · Note 4,5/5 (46 avis)', 'https://static.jow.fr/1024x1024/patterns/raddish-01-202309.png_merge_recipes/Mj0JCaRsK5nvTg.png.jpg', 'https://jow.fr/recipes/creme-de-panais-lard-et-oeufs-poches-8ks5es3jip8jfcwg0k0u',
           6, 28,
-          2, array['Jow'])
+          2, false,
+          array['Jow'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values
@@ -712,10 +731,11 @@ begin
   end if;
 
   insert into public.recipes
-    (title, description, image_url, source_url, prep_time, cook_time, servings, tags)
+    (title, description, image_url, source_url, prep_time, cook_time, servings, is_batch, tags)
   values ('Pain de thon à la tomate', '176 kcal/portion · Note 4,5/5 (135 avis)', 'https://static.jow.fr/1024x1024/patterns/raddish-04-202309.png_merge_recipes/9tKm1mDrVaLBjg.png.jpg', 'https://jow.fr/recipes/pain-de-thon-a-la-tomate-8lr7g7gelq3qi7940rpd',
           5, 40,
-          2, array['Jow', 'Four'])
+          2, false,
+          array['Jow', 'Four'])
   returning id into r;
 
   insert into public.recipe_ingredients (recipe_id, name, quantity, unit, aisle_category, position) values

@@ -96,7 +96,11 @@ for (const block of blocks) {
 
   const lien = block.match(/\*\*Lien\*\*\s*:\s*(\S+)/)?.[1] ?? null;
   const photo = block.match(/\*\*Photo\*\*\s*:\s*(\S+)/)?.[1] ?? null;
-  const portions = toNumber(block.match(/\*\*Portions\*\*\s*:\s*(\d+)/)?.[1]) ?? 2;
+  const portionsMatch = block.match(/\*\*Portions\*\*\s*:\s*(\d+)\s*([^·\n]*)/);
+  const portions = toNumber(portionsMatch?.[1]) ?? 2;
+  // « 6 quiches », « 4 tartes » : un plat entier, dont les quantités ne se
+  // divisent pas — contrairement à « 2 personnes ».
+  const platEntier = !/personne/i.test(portionsMatch?.[2] ?? "personnes");
   const preparation = toNumber(block.match(/\*\*Prépa\*\*\s*(\d+)/)?.[1]);
   const cuisson = toNumber(block.match(/\*\*Cuisson\*\*\s*(\d+)/)?.[1]);
   const total = toNumber(block.match(/\*\*Total\*\*\s*(\d+)/)?.[1]);
@@ -134,12 +138,13 @@ for (const block of blocks) {
 
   recipes.push({
     titre,
-    description: [stats, portions !== 2 ? `Recette pour ${portions} parts.` : null]
+    description: [stats, platEntier ? `Plat entier : ${portions} parts.` : null]
       .filter(Boolean)
       .join(" · "),
     lien,
     photo,
     portions,
+    platEntier,
     preparation,
     cuisson,
     etiquettes,

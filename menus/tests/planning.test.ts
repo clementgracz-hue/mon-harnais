@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { expiringSoon, suggestDays, urgencyOf } from "@/lib/planning";
-import { scaleQuantity } from "@/lib/servings";
+import { scaleQuantity, shoppingQuantity } from "@/lib/servings";
 import { daysUntil, formatExpiry, shelfLifeDays, suggestExpiry } from "@/lib/shelf-life";
 
 // Lundi 3 août 2026, pour que les jours suggérés soient prévisibles.
@@ -135,6 +135,23 @@ describe("expiringSoon", () => {
   it("ignore ce qui est déjà consommé", () => {
     const used = [{ ...pantry[0], is_used: true }];
     assert.deepEqual(expiringSoon(used, recipes, 3, LUNDI), []);
+  });
+});
+
+describe("shoppingQuantity", () => {
+  const quiche = { servings: 6, is_batch: true };
+  const plat = { servings: 2, is_batch: false };
+
+  it("ne divise jamais un plat entier", () => {
+    // Une quiche écrite pour 6 se fait en entier, même à deux.
+    assert.equal(shoppingQuantity(3, "pièce", quiche, 2), 3);
+    assert.equal(shoppingQuantity(400, "g", quiche, 2), 400);
+    assert.equal(shoppingQuantity(400, "g", quiche, 8), 400);
+  });
+
+  it("met à l'échelle un plat portionnable", () => {
+    assert.equal(shoppingQuantity(200, "g", plat, 4), 400);
+    assert.equal(shoppingQuantity(200, "g", plat, 2), 200);
   });
 });
 

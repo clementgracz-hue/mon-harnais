@@ -24,3 +24,19 @@ export function scaleQuantity(
     ? Math.max(1, Math.ceil(scaled))
     : Math.round(scaled * 10) / 10;
 }
+
+/**
+ * Quantité à acheter pour un ingrédient de recette.
+ *
+ * Un plat entier (quiche, cake, tarte) se fait en entier : ses quantités ne
+ * bougent pas, quel que soit le nombre de convives. Sinon, on met à l'échelle.
+ */
+export function shoppingQuantity(
+  quantity: number | null,
+  unit: string | null,
+  recipe: { servings: number; is_batch: boolean },
+  people: number,
+): number | null {
+  if (recipe.is_batch) return quantity;
+  return scaleQuantity(quantity, unit, recipe.servings, people);
+}

@@ -5,6 +5,7 @@
     "lien": "https://jow.fr/recipes/moussaka-8zvt7ixki3zk031107qt",
     "photo": "https://static.jow.fr/1024x1024/recipes/0MFnCzch8bjfqA.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 17,
     "cuisson": 40,
     "etiquettes": [
@@ -85,6 +86,7 @@
     "lien": "https://jow.fr/recipes/boeuf-saute-au-chou-8a1bec1kbyf7ipvn05r0",
     "photo": "https://static.jow.fr/1024x1024/patterns/powder-02-202309.png_merge_recipes/TOqVEL92jCPeZA.png.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 6,
     "cuisson": 10,
     "etiquettes": [
@@ -142,6 +144,7 @@
     "lien": "https://jow.fr/recipes/aubergines-braisees-au-porc-et-riz-8i983kndlzb4kl8k0hbv",
     "photo": "https://static.jow.fr/1024x1024/recipes/HeheyF7sqrK41A.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 16,
     "cuisson": 15,
     "etiquettes": [
@@ -212,6 +215,7 @@
     "lien": "https://jow.fr/recipes/feta-legumes-rotis-et-orzo-8zle1on1aups02uy0cjw",
     "photo": "https://static.jow.fr/1024x1024/recipes/tar79gFnsVhHkQ.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 7,
     "cuisson": 30,
     "etiquettes": [
@@ -267,10 +271,11 @@
   },
   {
     "titre": "Quiche chèvre épinards",
-    "description": "342 kcal/portion · Note 4,6/5 (1969 avis) · Recette pour 6 parts.",
+    "description": "342 kcal/portion · Note 4,6/5 (1969 avis) · Plat entier : 6 parts.",
     "lien": "https://jow.fr/recipes/quiche-chevre-epinards-89nzh3fuhktx84vm06ld",
     "photo": "https://static.jow.fr/1024x1024/recipes/WgXg1IF7xibdPw.jpg",
     "portions": 6,
+    "platEntier": true,
     "preparation": 16,
     "cuisson": 50,
     "etiquettes": [
@@ -321,6 +326,7 @@
     "lien": "https://jow.fr/recipes/tarte-fine-mortadelle-burrata-et-pistaches-95u7iwwjkbk7556h155x",
     "photo": "https://static.jow.fr/1024x1024/recipes/ImGf2LuxU6zphw.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 9,
     "cuisson": 25,
     "etiquettes": [
@@ -378,6 +384,7 @@
     "lien": "https://jow.fr/recipes/risotto-de-coquillettes-et-brocolis-93ada5zyh5kw02xx05je",
     "photo": "https://static.jow.fr/1024x1024/recipes/dLbsUquITjdZkw.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 7,
     "cuisson": 24,
     "etiquettes": [
@@ -436,6 +443,7 @@
     "lien": "https://jow.fr/recipes/saint-jacques-poelees-et-brocoli-83t31nax8ihsgaa60xq7",
     "photo": "https://static.jow.fr/1024x1024/patterns/beet-04-202309.png_merge_recipes/l0r9MOKw01Lm6w.png.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 7,
     "cuisson": 15,
     "etiquettes": [
@@ -478,6 +486,7 @@
     "lien": "https://jow.fr/recipes/gratin-de-poireaux-pommes-de-terre-et-fromage-a-raclette-92fe1lfaiojk030l0xvf",
     "photo": "https://static.jow.fr/1024x1024/recipes/PZ0SRl0YnYfgsw.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 15,
     "cuisson": 35,
     "etiquettes": [
@@ -539,6 +548,7 @@
     "lien": "https://jow.fr/recipes/saucisses-potatoes-au-air-fryer-et-salade-93656ewri07402sd0n43",
     "photo": "https://static.jow.fr/1024x1024/recipes/JL4v2NitwFRu3w.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 6,
     "cuisson": 30,
     "etiquettes": [
@@ -592,6 +602,7 @@
     "lien": "https://jow.fr/recipes/salade-de-macaroni-94352u8xli6pd2cr0oxy",
     "photo": "https://static.jow.fr/1024x1024/recipes/TzMyVbWUeNPhwg.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 6,
     "cuisson": 12,
     "etiquettes": [
@@ -646,6 +657,7 @@
     "lien": "https://jow.fr/recipes/hache-de-veau-carottes-roties-et-feta-93zg240j9hu75xiu1dwf",
     "photo": "https://static.jow.fr/1024x1024/recipes/qGxnJ8rcW0xGHQ.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 9,
     "cuisson": 20,
     "etiquettes": [
@@ -705,6 +717,7 @@
     "lien": "https://jow.fr/recipes/filet-mignon-a-la-moutarde-pommes-de-terre-et-brocoli-8tnibc4jkts16cux0nhv",
     "photo": "https://static.jow.fr/1024x1024/recipes/40dZEjt0J0qwNw.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 6,
     "cuisson": 45,
     "etiquettes": [
@@ -754,6 +767,7 @@
     "lien": "https://jow.fr/recipes/cheeseburger-poulet-et-sauce-miel-moutarde-9435cskhli6pd2cr1bn5",
     "photo": "https://static.jow.fr/1024x1024/recipes/KgEZvi6MwMh0dA.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 3,
     "cuisson": 8,
     "etiquettes": [
@@ -805,6 +819,7 @@
     "lien": "https://jow.fr/recipes/lasagnes-pesto-et-brocolis-8rlpjykf7xnn5djq0m4m",
     "photo": "https://static.jow.fr/1024x1024/recipes/YHjlVB3je0PkdQ.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 12,
     "cuisson": 44,
     "etiquettes": [
@@ -855,6 +870,7 @@
     "lien": "https://jow.fr/recipes/ravioles-a-la-toscane-8ekx43augkyoka5t0v68",
     "photo": "https://static.jow.fr/1024x1024/recipes/SQiYvIFirgqd6Q.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 3,
     "cuisson": 12,
     "etiquettes": [
@@ -909,6 +925,7 @@
     "lien": "https://jow.fr/recipes/grilled-cheese-brie-et-cerise-noire-81m063jq2lyo00tg05xs",
     "photo": "https://static.jow.fr/1024x1024/patterns/powder-02-202309.png_merge_recipes/D55eWNQChZ6NFQ.png.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 5,
     "cuisson": 4,
     "etiquettes": [
@@ -958,6 +975,7 @@
     "lien": "https://jow.fr/recipes/salade-endives-avocat-et-comte-8lf15bnr8rcicvir0y19",
     "photo": "https://static.jow.fr/1024x1024/patterns/beet-02-202309.png_merge_recipes/8T6uRJltaWuurA.png.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 5,
     "cuisson": 0,
     "etiquettes": [
@@ -1017,6 +1035,7 @@
     "lien": "https://jow.fr/recipes/creme-de-panais-lard-et-oeufs-poches-8ks5es3jip8jfcwg0k0u",
     "photo": "https://static.jow.fr/1024x1024/patterns/raddish-01-202309.png_merge_recipes/Mj0JCaRsK5nvTg.png.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 6,
     "cuisson": 28,
     "etiquettes": [
@@ -1073,6 +1092,7 @@
     "lien": "https://jow.fr/recipes/pain-de-thon-a-la-tomate-8lr7g7gelq3qi7940rpd",
     "photo": "https://static.jow.fr/1024x1024/patterns/raddish-04-202309.png_merge_recipes/9tKm1mDrVaLBjg.png.jpg",
     "portions": 2,
+    "platEntier": false,
     "preparation": 5,
     "cuisson": 40,
     "etiquettes": [

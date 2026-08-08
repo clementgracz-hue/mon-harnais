@@ -67,6 +67,8 @@ export function RecipeForm({ recipe, onSaved, onCancel }: Props) {
   const [prepTime, setPrepTime] = useState(String(recipe?.prep_time ?? ""));
   const [cookTime, setCookTime] = useState(String(recipe?.cook_time ?? ""));
   const [tags, setTags] = useState<string[]>(recipe?.tags ?? []);
+  const [servings, setServings] = useState(String(recipe?.servings ?? 2));
+  const [isBatch, setIsBatch] = useState(recipe?.is_batch ?? false);
 
   const [ingredients, setIngredients] = useState<IngredientDraft[]>(() => {
     const rows = [...(recipe?.recipe_ingredients ?? [])].sort(
@@ -118,6 +120,8 @@ export function RecipeForm({ recipe, onSaved, onCancel }: Props) {
       source_url: sourceUrl.trim() || null,
       prep_time: prepTime ? Number(prepTime) : null,
       cook_time: cookTime ? Number(cookTime) : null,
+      servings: Number(servings) || 2,
+      is_batch: isBatch,
       tags,
     };
 
@@ -225,6 +229,41 @@ export function RecipeForm({ recipe, onSaved, onCancel }: Props) {
             onChange={(event) => setCookTime(event.target.value)}
           />
         </div>
+      </div>
+
+      <div className="space-y-2 rounded-lg border p-3">
+        <div className="flex items-center gap-3">
+          <Label htmlFor="servings" className="flex-1 text-foreground">
+            Quantités écrites pour
+          </Label>
+          <Input
+            id="servings"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={12}
+            value={servings}
+            onChange={(event) => setServings(event.target.value)}
+            className="w-20 text-center"
+          />
+          <span className="text-sm text-muted-foreground">parts</span>
+        </div>
+
+        <label className="flex items-start gap-3 text-sm">
+          <input
+            type="checkbox"
+            checked={isBatch}
+            onChange={(event) => setIsBatch(event.target.checked)}
+            className="mt-1 h-5 w-5 accent-[hsl(var(--primary))]"
+          />
+          <span>
+            Plat entier (quiche, cake, tarte)
+            <span className="block text-xs text-muted-foreground">
+              Ses quantités ne sont jamais divisées&nbsp;: on le fait en entier,
+              quel que soit le nombre de convives.
+            </span>
+          </span>
+        </label>
       </div>
 
       <div className="space-y-1.5">

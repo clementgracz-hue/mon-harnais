@@ -14,7 +14,7 @@ import type {
   StapleProduct,
   WishlistItem,
 } from "@/lib/types/database";
-import { scaleQuantity } from "@/lib/servings";
+import { shoppingQuantity } from "@/lib/servings";
 import { displayName } from "@/lib/user";
 import { getIsoWeek } from "@/lib/utils";
 
@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 
 type MenuRow = {
   recipes:
-    | (Pick<Recipe, "id" | "title" | "servings"> & {
+    | (Pick<Recipe, "id" | "title" | "servings" | "is_batch"> & {
         recipe_ingredients: RecipeIngredient[];
       })
     | null;
@@ -45,7 +45,7 @@ export default async function ShoppingPage() {
       menu
         ? supabase
             .from("weekly_menu_recipes")
-            .select("recipes(id, title, servings, recipe_ingredients(*))")
+            .select("recipes(id, title, servings, is_batch, recipe_ingredients(*))")
             .eq("menu_id", menu.id)
         : Promise.resolve({ data: [] as MenuRow[] }),
       supabase.from("shopping_wishlist").select("*").eq("is_checked", false),
@@ -63,11 +63,10 @@ export default async function ShoppingPage() {
     ...((menuRows ?? []) as unknown as MenuRow[]).flatMap((row) =>
       (row.recipes?.recipe_ingredients ?? []).map((ingredient) => ({
         name: ingredient.name,
-        // Recette écrite pour N parts, panier généré pour le nombre de convives.
-        quantity: scaleQuantity(
+        quantity: shoppingQuantity(
           ingredient.quantity,
           ingredient.unit,
-          row.recipes?.servings ?? 2,
+          row.recipes ?? { servings: 2, is_batch: false },
           servings,
         ),
         unit: ingredient.unit,

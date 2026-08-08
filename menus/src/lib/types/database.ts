@@ -49,6 +49,8 @@ export type Recipe = {
   tags: string[];
   /** Nombre de parts pour lequel les quantités sont écrites. */
   servings: number;
+  /** Plat entier : on le fait en entier, ses quantités ne se divisent pas. */
+  is_batch: boolean;
   created_at: string;
 };
 

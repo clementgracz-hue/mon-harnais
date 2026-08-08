@@ -53,6 +53,8 @@ create table if not exists public.recipes (
 alter table public.recipes add column if not exists source_url text;
 -- Nombre de parts pour lequel les quantités sont écrites (Jow : 2).
 alter table public.recipes add column if not exists servings integer not null default 2;
+-- Plat entier (quiche, cake, tarte) : les quantités ne se divisent pas.
+alter table public.recipes add column if not exists is_batch boolean not null default false;
 
 create index if not exists recipes_tags_idx  on public.recipes using gin (tags);
 create index if not exists recipes_title_idx on public.recipes (lower(title));
