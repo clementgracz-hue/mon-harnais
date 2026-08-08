@@ -8,9 +8,10 @@ import type { RecipeCardData } from "@/components/recipe-card";
 import { RecipeList } from "@/components/recipe-list";
 import { ServingsSetting } from "@/components/servings-setting";
 import { Button } from "@/components/ui/button";
+import { WEEK_CAPACITY } from "@/lib/schedule";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe, RecipeIngredient } from "@/lib/types/database";
-import { getIsoWeek } from "@/lib/utils";
+import { cn, getIsoWeek } from "@/lib/utils";
 import { deriveVeg } from "@/lib/veg";
 
 export const metadata: Metadata = { title: "Recettes" };
@@ -54,6 +55,8 @@ export default async function RecipesPage() {
   );
 
   const count = recipes.length;
+  // La semaine tient 9 repas : un par jour, deux le samedi et le dimanche.
+  const selected = (entries ?? []).length;
 
   return (
     <main className="pb-nav">
@@ -73,6 +76,19 @@ export default async function RecipesPage() {
       />
       <div className="space-y-3 px-4 pt-4">
         <ServingsSetting week={week} year={year} servings={menu?.servings ?? 2} />
+
+        <p
+          className={cn(
+            "text-center text-xs",
+            selected > WEEK_CAPACITY
+              ? "font-medium text-amber-700 dark:text-amber-400"
+              : "text-muted-foreground",
+          )}
+        >
+          {selected} repas au menu sur {WEEK_CAPACITY} créneaux
+          {selected > WEEK_CAPACITY &&
+            ` — ${selected - WEEK_CAPACITY} resteront à placer`}
+        </p>
 
         <Button asChild size="lg" className="w-full">
           <Link href="/courses">

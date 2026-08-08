@@ -105,10 +105,23 @@ describe("suggestDays", () => {
     assert.equal(suggestDays(recipes, pantry, jeudi)[0].day, "jeudi");
   });
 
-  it("ne déborde pas de la semaine", () => {
+  it("double les créneaux du week-end", () => {
+    const samedi = new Date("2026-08-08T10:00:00");
+    assert.deepEqual(
+      suggestDays(recipes, pantry, samedi).map((entry) => entry.day),
+      ["samedi", "samedi", "dimanche", "dimanche"],
+    );
+  });
+
+  it("laisse « à placer » ce qui ne tient pas dans la semaine", () => {
     const dimanche = new Date("2026-08-09T10:00:00");
     const plan = suggestDays(recipes, pantry, dimanche);
-    assert.ok(plan.every((entry) => entry.day === "dimanche"));
+
+    // Dimanche vaut deux repas : les deux derniers n'ont plus de créneau.
+    assert.deepEqual(
+      plan.map((entry) => entry.day),
+      ["dimanche", "dimanche", null, null],
+    );
   });
 });
 

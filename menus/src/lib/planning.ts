@@ -1,6 +1,7 @@
 import { normalizeName } from "@/lib/shopping";
+import { slotsFrom } from "@/lib/schedule";
 import { daysUntil } from "@/lib/shelf-life";
-import { DAYS, type Day } from "@/lib/types/database";
+import type { Day } from "@/lib/types/database";
 
 export type PantryEntry = {
   id: string;
@@ -62,15 +63,16 @@ export function urgencyOf(
 }
 
 /**
- * Ordonne les repas par urgence et leur attribue un jour, à partir
+ * Ordonne les repas par urgence et leur attribue un créneau, à partir
  * d'aujourd'hui. Une recette sans produit périssable identifié passe en
- * dernier — rien ne presse.
+ * dernier — rien ne presse. Au-delà des créneaux restants (un par jour, deux
+ * le week-end), le repas revient « à placer » plutôt que d'écraser un autre.
  */
 export function suggestDays(
   recipes: PlannedRecipe[],
   pantry: PantryEntry[],
   from = new Date(),
-): Array<RecipeUrgency & { day: Day }> {
+): Array<RecipeUrgency & { day: Day | null }> {
   const ranked = [...urgencyOf(recipes, pantry)].sort((a, b) => {
     if (a.expiresOn && b.expiresOn) return a.expiresOn.localeCompare(b.expiresOn);
     if (a.expiresOn) return -1;
@@ -78,12 +80,11 @@ export function suggestDays(
     return a.title.localeCompare(b.title, "fr");
   });
 
-  // Index du jour courant dans la semaine ISO (lundi = 0).
-  const todayIndex = (from.getDay() + 6) % 7;
+  const slots = slotsFrom(from);
 
   return ranked.map((recipe, position) => ({
     ...recipe,
-    day: DAYS[Math.min(todayIndex + position, DAYS.length - 1)],
+    day: slots[position] ?? null,
   }));
 }
 

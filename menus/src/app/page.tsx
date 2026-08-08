@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { RunPlanner, type RunMeal } from "@/components/run-planner";
 import { Button } from "@/components/ui/button";
 import { urgencyOf } from "@/lib/planning";
+import { WEEK_CAPACITY } from "@/lib/schedule";
 import { createClient } from "@/lib/supabase/server";
 import type { PantryItem, ShoppingRun } from "@/lib/types/database";
 import { displayName } from "@/lib/user";
@@ -30,7 +31,7 @@ export default async function HomePage() {
   const { data } = await supabase
     .from("shopping_runs")
     .select(
-      "*, shopping_run_recipes(*, recipes(title, rating, prep_time, cook_time, recipe_ingredients(name)))",
+      "*, shopping_run_recipes(*, recipes(title, image_url, rating, prep_time, cook_time, recipe_ingredients(name)))",
     )
     .order("created_at", { ascending: false })
     .limit(1)
@@ -129,7 +130,7 @@ export default async function HomePage() {
               </span>
               <span className="block text-xs text-muted-foreground">
                 Semaine {run.week_number} · {run.item_count} articles ·{" "}
-                {meals.length} repas
+                {meals.length} repas sur {WEEK_CAPACITY} créneaux
                 {run.closed_by && ` · ${run.closed_by}`}
               </span>
             </span>
