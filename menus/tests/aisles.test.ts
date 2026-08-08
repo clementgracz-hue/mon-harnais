@@ -40,6 +40,15 @@ describe("guessAisle", () => {
     assert.equal(guessAisle("Lait demi-écrémé"), "Crémerie");
   });
 
+  it("range les épices avec les épices, pas avec le sucré", () => {
+    assert.equal(guessAisle("Muscade"), "Épicerie salée");
+    assert.equal(guessAisle("Cannelle"), "Épicerie salée");
+    assert.equal(guessAisle("Herbes de Provence"), "Épicerie salée");
+    // Les herbes fraîches restent au rayon frais.
+    assert.equal(guessAisle("Menthe fraîche"), "Fruits & Légumes");
+    assert.equal(guessAisle("Basilic (frais)"), "Fruits & Légumes");
+  });
+
   it("retombe sur « Autres » quand rien ne correspond", () => {
     assert.equal(guessAisle("Truc inconnu"), "Autres");
   });

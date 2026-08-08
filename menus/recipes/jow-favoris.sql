@@ -28,7 +28,7 @@ begin
     (r, 'Beurre', 30, 'g', 'Crémerie', 6),
     (r, 'Lait', 250, 'ml', 'Crémerie', 7),
     (r, 'Mozzarella (râpée)', 60, 'g', 'Crémerie', 8),
-    (r, 'Muscade', 2, 'pincée', 'Épicerie sucrée', 9);
+    (r, 'Muscade', 2, 'pincée', 'Épicerie salée', 9);
 
   insert into public.recipe_steps (recipe_id, step_number, instruction) values
     (r, 1, 'Préchauffez le four à 180°C. Lavez puis coupez les aubergines en très fines lamelles dans le sens de la longueur.'),
@@ -375,7 +375,7 @@ begin
     (r, 'Salade (mélange)', 2, 'poignée', 'Fruits & Légumes', 2),
     (r, 'Ketchup', 2, 'c. à c.', 'Épicerie salée', 3),
     (r, 'Moutarde', 2, 'c. à c.', 'Épicerie salée', 4),
-    (r, 'Origan (séché)', 2, 'pincée', 'Fruits & Légumes', 5);
+    (r, 'Origan (séché)', 2, 'pincée', 'Épicerie salée', 5);
 
   insert into public.recipe_steps (recipe_id, step_number, instruction) values
     (r, 1, 'Lavez puis coupez les pommes de terre en quartiers.'),
@@ -485,7 +485,7 @@ begin
     (r, 'Pommes de terre', 300, 'g', 'Fruits & Légumes', 1),
     (r, 'Brocoli (frais)', 200, 'g', 'Fruits & Légumes', 2),
     (r, 'Moutarde à l''ancienne', 2, 'c. à c.', 'Épicerie salée', 3),
-    (r, 'Thym (feuilles)', 2, 'pincée', 'Fruits & Légumes', 4);
+    (r, 'Thym (feuilles)', 2, 'pincée', 'Épicerie salée', 4);
 
   insert into public.recipe_steps (recipe_id, step_number, instruction) values
     (r, 1, 'Préchauffez le four à 190°C. Lavez et découpez les pommes de terre en très fines lamelles.'),

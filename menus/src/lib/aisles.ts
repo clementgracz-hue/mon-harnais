@@ -58,7 +58,8 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
     "Épicerie salée",
     [
       "pâtes", "spaghetti", "riz", "farine", "huile", "vinaigre", "sel", "poivre",
-      "épice", "curry", "cumin", "paprika", "conserve", "tomate pelée", "concentré",
+      "épice", "curry", "cumin", "paprika", "muscade", "cannelle", "herbes de provence",
+      "origan", "thym", "estragon", "piment", "conserve", "tomate pelée", "concentré",
       "lentille", "pois chiche", "quinoa", "semoule", "couscous", "thon", "moutarde",
       "bouillon", "coulis", "lait de coco", "crème de coco", "sauce soja", "boulgour",
       "haricot rouge", "polenta", "pesto", "béchamel", "orzo", "blé", "mélange céréales",
@@ -72,8 +73,7 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
     [
       "sucre", "chocolat", "café", "thé", "confiture", "miel", "céréales", "biscuit",
       "levure", "vanille", "compote", "pâte à tartiner", "cacao", "noisette", "noix",
-      "amande", "pistache", "avoine", "corn flakes", "sirop d'érable", "muscade",
-      "cannelle", "flocons",
+      "amande", "pistache", "avoine", "corn flakes", "sirop d'érable", "flocons",
     ],
   ],
   [
@@ -117,8 +117,8 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "poireau", "navet", "radis", "melon", "raisin", "kiwi", "clémentine",
       "endive", "panais", "patate douce", "potimarron", "butternut", "céleri",
       "abricot", "nectarine", "pamplemousse", "framboise", "cerise", "rhubarbe",
-      "chou blanc", "chou-fleur", "gingembre", "menthe", "ciboulette", "estragon",
-      "origan", "thym", "herbes de provence", "laitue", "mâche", "roquette",
+      "chou blanc", "chou-fleur", "gingembre", "menthe", "ciboulette",
+      "laitue", "mâche", "roquette",
     ],
   ],
 ];
