@@ -1,6 +1,12 @@
 -- 113 recette(s) — généré par scripts/recipes-to-sql.mjs
 -- Rejouable : une recette déjà présente (même titre) est ignorée.
 
+-- Colonnes ajoutées après la première version du schéma : le fichier
+-- s'installe seul, même sur une base qui n'a pas rejoué schema.sql.
+alter table public.recipes add column if not exists source_url text;
+alter table public.recipes add column if not exists servings integer not null default 2;
+alter table public.recipes add column if not exists is_batch boolean not null default false;
+
 -- Moussaka
 do $$
 declare r uuid;
