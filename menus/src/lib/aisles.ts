@@ -46,9 +46,9 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
   ],
   [
     "Entretien & Maison",
-    ["lessive", "liquide vaisselle", "éponge", "papier toilette", "essuie-tout", "sac poubelle", "nettoyant", "sopalin", "adoucissant", "papier cuisson"],
+    ["lessive", "liquide vaisselle", "éponge", "papier toilette", "essuie-tout", "sac poubelle", "nettoyant", "sopalin", "adoucissant", "papier cuisson", "pic à brochette", "pique à brochette", "papier aluminium"],
   ],
-  ["Boissons", ["jus", "eau", "soda", "bière", "vin", "sirop", "limonade", "cola"]],
+  ["Boissons", ["jus", "eau", "soda", "bière", "vin", "sirop", "limonade", "cola", "amaretto", "liqueur", "rhum"]],
   ["Surgelés", ["surgelé", "glace", "poêlée surgelée"]],
   [
     "Poissonnerie",
@@ -60,12 +60,13 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "pâtes", "spaghetti", "riz", "farine", "huile", "vinaigre", "sel", "poivre",
       "épice", "curry", "cumin", "paprika", "muscade", "cannelle", "herbes de provence",
       "origan", "thym", "estragon", "piment", "conserve", "tomate pelée", "concentré",
-      "lentille", "pois chiche", "quinoa", "semoule", "couscous", "thon", "moutarde",
+      "lentille", "pois chiche", "quinoa", "semoule", "couscous", "thon", "moutarde", "mustard",
       "bouillon", "coulis", "lait de coco", "crème de coco", "sauce soja", "boulgour",
       "haricot rouge", "polenta", "pesto", "béchamel", "orzo", "blé", "mélange céréales",
       "olive", "tomate séchée", "houmous", "ketchup", "sauce tomate", "marron",
-      "châtaigne", "chips de légumes", "chips de tortillas", "tortilla", "vin blanc",
-      "graines de sésame", "graines de chia", "pignon de pin", "vinaigre", "crème de balsamique",
+      "châtaigne", "chips de légumes", "chips de tortillas", "tortilla",
+      "graines de sésame", "graines de chia", "pignon de pin", "vinaigre",
+      "crème de balsamique", "crème balsamique",
     ],
   ],
   [
@@ -135,6 +136,9 @@ function fold(value: string) {
  * matche \u00ab petit pois \u00bb). La recherche par simple sous-cha\u00eene classait
  * \u00ab Couches taille 4 \u00bb en Fruits & L\u00e9gumes : \u00ab ail \u00bb est contenu dans
  * \u00ab taille \u00bb.
+ *
+ * Le trait d'union coupe \u00e0 gauche : \u00ab beurre demi-sel \u00bb n'est pas du sel.
+ * \u00c0 droite il reste coll\u00e9, pour que \u00ab c\u00e9leri \u00bb attrape \u00ab c\u00e9leri-rave \u00bb.
  */
 function toWordRegex(words: string[]) {
   const alternatives = words
@@ -146,7 +150,7 @@ function toWordRegex(words: string[]) {
       return [...head, parts[parts.length - 1]].join("\\s+");
     })
     .join("|");
-  return new RegExp(`(?<!\\p{L})(?:${alternatives})(?:s|es|x)?(?!\\p{L})`, "u");
+  return new RegExp(`(?<![\\p{L}-])(?:${alternatives})(?:s|es|x)?(?!\\p{L})`, "u");
 }
 
 const AISLE_MATCHERS: Array<[Aisle, RegExp]> = KEYWORDS.map(([aisle, words]) => [
@@ -154,11 +158,24 @@ const AISLE_MATCHERS: Array<[Aisle, RegExp]> = KEYWORDS.map(([aisle, words]) => 
   toWordRegex(words),
 ]);
 
+/**
+ * Le premier rayon qui matche gagne, sauf si un rayon plus bas reconna\u00eet un
+ * libell\u00e9 plus pr\u00e9cis \u00e0 partir du m\u00eame mot : \u00ab sirop d'\u00e9rable \u00bb l'emporte
+ * sur \u00ab sirop \u00bb, donc \u00c9picerie sucr\u00e9e plut\u00f4t que Boissons.
+ */
 export function guessAisle(name: string): Aisle {
   const haystack = fold(name);
+  let best: { aisle: Aisle; index: number; length: number } | null = null;
 
   for (const [aisle, matcher] of AISLE_MATCHERS) {
-    if (matcher.test(haystack)) return aisle;
+    const match = matcher.exec(haystack);
+    if (!match) continue;
+
+    const candidate = { aisle, index: match.index, length: match[0].length };
+    if (!best) best = candidate;
+    else if (candidate.index === best.index && candidate.length > best.length) {
+      best = candidate;
+    }
   }
-  return "Autres";
+  return best?.aisle ?? "Autres";
 }

@@ -72,7 +72,10 @@ function parseIngredient(line) {
 
   let unite = null;
   const first = rest.split(/\s+/)[0];
-  const mapped = UNITS.get(first.toLowerCase());
+  // Casse significative : Jow écrit les unités en minuscules et capitalise les
+  // produits. Sans ça, « 6 Feuille de brick » deviendrait 6 feuilles de « de
+  // brick ».
+  const mapped = UNITS.get(first);
   if (mapped && rest.split(/\s+/).length > 1) {
     unite = mapped;
     rest = rest.slice(first.length).trim();

@@ -49,6 +49,19 @@ describe("guessAisle", () => {
     assert.equal(guessAisle("Basilic (frais)"), "Fruits & Légumes");
   });
 
+  it("préfère le libellé le plus précis à partir du même mot", () => {
+    assert.equal(guessAisle("Sirop d'érable"), "Épicerie sucrée");
+    assert.equal(guessAisle("Sirop de menthe"), "Boissons");
+    assert.equal(guessAisle("Crème balsamique"), "Épicerie salée");
+    assert.equal(guessAisle("Crème fraîche"), "Crémerie");
+  });
+
+  it("coupe au trait d'union à gauche seulement", () => {
+    assert.equal(guessAisle("Beurre demi-sel"), "Crémerie");
+    assert.equal(guessAisle("Sel fin"), "Épicerie salée");
+    assert.equal(guessAisle("Céleri-rave"), "Fruits & Légumes");
+  });
+
   it("retombe sur « Autres » quand rien ne correspond", () => {
     assert.equal(guessAisle("Truc inconnu"), "Autres");
   });
