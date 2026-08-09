@@ -5,7 +5,9 @@ import {
   consolidate,
   countItems,
   normalizeName,
+  preferenceNote,
   toDriveText,
+  PREFERENCES,
   type RawItem,
 } from "@/lib/shopping";
 
@@ -164,5 +166,35 @@ describe("toDriveText", () => {
     const text = toDriveText(sections, { withAisles: false });
     assert.doesNotMatch(text, /CRÉMERIE/);
     assert.match(text, /- Beurre — 250 g/);
+  });
+
+  it("place la consigne tout en haut", () => {
+    const text = toDriveText(sections, { note: "Préférences : bio de préférence" });
+    assert.equal(text.split("\n")[0], "Préférences : bio de préférence");
+  });
+
+  it("n'ajoute pas de ligne vide quand il n'y a pas de consigne", () => {
+    assert.equal(toDriveText(sections, { note: "" }), toDriveText(sections));
+    assert.equal(toDriveText(sections, { note: "   " }), toDriveText(sections));
+  });
+});
+
+describe("preferenceNote", () => {
+  it("ne dit rien quand rien n'est coché", () => {
+    assert.equal(preferenceNote([]), "");
+  });
+
+  it("écrit la consigne dans l'ordre des cases", () => {
+    assert.equal(
+      preferenceNote(["économique", "bio"]),
+      "Préférences : bio de préférence · premiers prix",
+    );
+  });
+
+  it("accepte les trois à la fois", () => {
+    assert.equal(
+      preferenceNote(PREFERENCES),
+      "Préférences : bio de préférence · marques connues · premiers prix",
+    );
   });
 });

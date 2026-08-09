@@ -224,10 +224,14 @@ export function consolidate(items: RawItem[]): ShoppingSection[] {
  */
 export function toDriveText(
   sections: ShoppingSection[],
-  options: { withAisles?: boolean; skip?: Set<string> } = {},
+  options: { withAisles?: boolean; skip?: Set<string>; note?: string } = {},
 ) {
-  const { withAisles = true, skip } = options;
+  const { withAisles = true, skip, note } = options;
   const blocks: string[] = [];
+
+  // L'en-tête part en tête du presse-papier : c'est la consigne qu'on relit
+  // en choisissant les produits sur le Drive.
+  if (note?.trim()) blocks.push(note.trim());
 
   for (const section of sections) {
     const items = section.items.filter((item) => !skip?.has(item.key));
@@ -246,6 +250,37 @@ export function toDriveText(
   }
 
   return blocks.join("\n\n");
+}
+
+/**
+ * Ce qu'on veut au moment de choisir les produits sur le Drive. Les trois
+ * ne s'excluent pas : bio sur le frais et premiers prix sur l'épicerie est un
+ * arbitrage courant.
+ */
+export const PREFERENCES = ["bio", "marques", "économique"] as const;
+
+export type Preference = (typeof PREFERENCES)[number];
+
+export const PREFERENCE_LABELS: Record<Preference, string> = {
+  bio: "Bio",
+  marques: "Marques",
+  économique: "Économique",
+};
+
+const PREFERENCE_NOTES: Record<Preference, string> = {
+  bio: "bio de préférence",
+  marques: "marques connues",
+  économique: "premiers prix",
+};
+
+/** En-tête de la liste copiée. Vide si rien n'est coché. */
+export function preferenceNote(preferences: Iterable<Preference>) {
+  const chosen = new Set(preferences);
+  const notes = PREFERENCES.filter((preference) => chosen.has(preference)).map(
+    (preference) => PREFERENCE_NOTES[preference],
+  );
+
+  return notes.length === 0 ? "" : `Préférences : ${notes.join(" · ")}`;
 }
 
 export function countItems(sections: ShoppingSection[]) {

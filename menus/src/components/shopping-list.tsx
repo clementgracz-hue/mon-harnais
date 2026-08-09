@@ -20,7 +20,11 @@ import { createClient } from "@/lib/supabase/client";
 import {
   consolidate,
   countItems,
+  preferenceNote,
   toDriveText,
+  PREFERENCES,
+  PREFERENCE_LABELS,
+  type Preference,
   type RawItem,
   type ShoppingSource,
 } from "@/lib/shopping";
@@ -33,6 +37,9 @@ const SOURCE_LABELS: Record<ShoppingSource, string> = {
 };
 
 const SOURCE_ORDER: ShoppingSource[] = ["recette", "pense-bête", "récurrent"];
+
+/** Les préférences valent pour toutes les semaines, pas seulement celle-ci. */
+const PREFERENCES_KEY = "courses:preferences";
 
 function ClosedNotice({ runId }: { runId: string }) {
   return (
@@ -66,6 +73,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
     () => new Set(SOURCE_ORDER),
   );
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [preferences, setPreferences] = useState<Set<Preference>>(new Set());
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -78,6 +86,13 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
     if (stored) setChecked(new Set(JSON.parse(stored) as string[]));
+
+    const storedPreferences = window.localStorage.getItem(PREFERENCES_KEY);
+    if (storedPreferences) {
+      const saved = new Set(JSON.parse(storedPreferences) as string[]);
+      setPreferences(new Set(PREFERENCES.filter((item) => saved.has(item))));
+    }
+
     setHydrated(true);
   }, [storageKey]);
 
@@ -86,6 +101,12 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
       window.localStorage.setItem(storageKey, JSON.stringify([...checked]));
     }
   }, [checked, hydrated, storageKey]);
+
+  useEffect(() => {
+    if (hydrated) {
+      window.localStorage.setItem(PREFERENCES_KEY, JSON.stringify([...preferences]));
+    }
+  }, [hydrated, preferences]);
 
   const sections = useMemo(
     () => consolidate(items.filter((item) => sources.has(item.source))),
@@ -96,7 +117,10 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
   const remaining = total - checked.size;
 
   async function copyList() {
-    const text = toDriveText(sections, { skip: checked });
+    const text = toDriveText(sections, {
+      skip: checked,
+      note: preferenceNote(preferences),
+    });
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -193,6 +217,59 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
     </div>
   );
 
+  const note = preferenceNote(preferences);
+
+  // Ce qu'on veut au rayon : la consigne part en tête du presse-papier.
+  const preferenceBoxes = (
+    <div className="rounded-xl border p-3">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Préférences
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {PREFERENCES.map((preference) => {
+          const active = preferences.has(preference);
+          return (
+            <button
+              key={preference}
+              type="button"
+              role="checkbox"
+              aria-checked={active}
+              onClick={() =>
+                setPreferences((current) => {
+                  const next = new Set(current);
+                  if (next.has(preference)) next.delete(preference);
+                  else next.add(preference);
+                  return next;
+                })
+              }
+              className={cn(
+                "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+                active ? "border-primary font-medium" : "text-muted-foreground",
+              )}
+            >
+              <span
+                className={cn(
+                  "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-input",
+                )}
+              >
+                {active && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+              </span>
+              {PREFERENCE_LABELS[preference]}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        {note
+          ? `En tête du copier : « ${note} »`
+          : "Rien en tête de la liste copiée."}
+      </p>
+    </div>
+  );
+
   if (total === 0) {
     const everythingHidden = sources.size === 0 && items.length > 0;
     return (
@@ -200,6 +277,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
         {/* Le panier vient d'être vidé : le lien vers l'archive doit rester. */}
         {done && <ClosedNotice runId={done} />}
         {filters}
+        {preferenceBoxes}
         <p className="p-8 text-center text-sm text-muted-foreground">
           {everythingHidden
             ? "Aucune source sélectionnée : réactive un filtre ci-dessus."
@@ -212,6 +290,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
   return (
     <div className="space-y-4 p-4">
       {filters}
+      {preferenceBoxes}
 
       <div className="sticky top-[calc(3.75rem+env(safe-area-inset-top))] z-20 flex items-center gap-2 rounded-xl border bg-background/95 p-3 backdrop-blur">
         <div className="flex-1">
