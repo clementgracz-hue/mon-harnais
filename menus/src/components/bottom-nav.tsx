@@ -24,8 +24,8 @@ type NavItem = {
 
 const ITEMS: NavItem[] = [
   { href: "/", label: "Semaine", icon: CalendarDays },
-  { href: "/recettes", label: "Recettes", icon: BookOpen },
   { href: "/pense-bete", label: "Pense-bête", icon: StickyNote, badge: "wishlist" },
+  { href: "/recettes", label: "Recettes", icon: BookOpen },
   { href: "/courses", label: "Courses", icon: ShoppingCart },
 ];
 

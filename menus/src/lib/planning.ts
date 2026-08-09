@@ -37,6 +37,21 @@ function matches(ingredient: string, pantryName: string) {
   return a === b || a.includes(b) || b.includes(a);
 }
 
+/**
+ * Les produits du frigo qu'une recette consomme. Sert à les solder quand le
+ * repas est validé : ce qui a été cuisiné n'est plus au frigo.
+ */
+export function pantryUsedBy(
+  ingredients: string[],
+  pantry: PantryEntry[],
+): PantryEntry[] {
+  return pantry.filter(
+    (item) =>
+      !item.is_used &&
+      ingredients.some((ingredient) => matches(ingredient, item.name)),
+  );
+}
+
 /** Pour chaque recette, la DLC la plus proche parmi ses ingrédients. */
 export function urgencyOf(
   recipes: PlannedRecipe[],

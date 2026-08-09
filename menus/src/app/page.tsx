@@ -13,10 +13,9 @@ import { displayName } from "@/lib/user";
 
 export const dynamic = "force-dynamic";
 
-type RunRow = ShoppingRun & {
-  shopping_run_recipes: Array<
-    RunMeal & { recipes: (RunMeal["recipes"] & { recipe_ingredients: { name: string }[] }) | null }
-  >;
+type MealRow = RunMeal & {
+  recipes: (RunMeal["recipes"] & { recipe_ingredients: { name: string }[] }) | null;
+  shopping_runs: Pick<ShoppingRun, "created_at" | "week_number"> | null;
 };
 
 export default async function HomePage() {
@@ -26,18 +25,21 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // La semaine que l'on mange est celle de la dernière commande clôturée —
-  // pas le panier en cours de composition dans l'onglet Recettes.
-  const { data } = await supabase
-    .from("shopping_runs")
+  // Un repas reste au planning tant qu'il n'a pas été cuisiné — un nouveau
+  // Drive n'efface pas ce qu'on n'a pas encore mangé.
+  const { data: mealRows } = await supabase
+    .from("shopping_run_recipes")
     .select(
-      "*, shopping_run_recipes(*, recipes(title, image_url, rating, prep_time, cook_time, recipe_ingredients(name)))",
+      "*, shopping_runs(created_at, week_number), recipes(title, image_url, rating, prep_time, cook_time, recipe_ingredients(name))",
     )
+    .is("cooked_at", null);
+
+  const { data: run } = await supabase
+    .from("shopping_runs")
+    .select("*")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-
-  const run = data as RunRow | null;
 
   const { data: pantry } = await supabase
     .from("pantry_items")
@@ -47,7 +49,17 @@ export default async function HomePage() {
     .order("expires_on");
 
   const fridge = (pantry ?? []) as PantryItem[];
-  const meals = run?.shopping_run_recipes ?? [];
+
+  // La commande la plus récente d'abord, et à date égale l'ordre du planning.
+  const meals = ((mealRows ?? []) as MealRow[]).sort((a, b) =>
+    (b.shopping_runs?.created_at ?? "").localeCompare(
+      a.shopping_runs?.created_at ?? "",
+    ),
+  );
+
+  const carriedOver = run
+    ? meals.filter((meal) => meal.run_id !== run.id).length
+    : 0;
 
   const plannedRecipes = meals
     .filter((meal) => meal.recipe_id && meal.recipes)
@@ -130,8 +142,9 @@ export default async function HomePage() {
               </span>
               <span className="block text-xs text-muted-foreground">
                 Semaine {run.week_number} · {run.item_count} articles ·{" "}
-                {meals.length} repas sur {WEEK_CAPACITY} créneaux
-                {run.closed_by && ` · ${run.closed_by}`}
+                {meals.length} repas à cuisiner sur {WEEK_CAPACITY} créneaux
+                {carriedOver > 0 &&
+                  ` · dont ${carriedOver} d'une commande précédente`}
               </span>
             </span>
             <span className="shrink-0 text-sm font-medium text-primary">
@@ -149,8 +162,10 @@ export default async function HomePage() {
           />
 
           <RunPlanner
-            meals={meals as RunMeal[]}
+            meals={meals}
             urgency={urgency}
+            pantry={fridge}
+            currentRunId={run.id}
             author={displayName(user)}
           />
         </div>

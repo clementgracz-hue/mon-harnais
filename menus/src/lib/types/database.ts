@@ -148,6 +148,9 @@ export type ShoppingRunRecipe = {
   title: string;
   day_assigned: Day | null;
   is_kid_friendly_veg: boolean;
+  /** Date de validation : tant qu'elle est nulle, le repas reste à cuisiner. */
+  cooked_at: string | null;
+  cooked_by: string | null;
 };
 
 export type PantryItem = {
@@ -248,6 +251,7 @@ export type Database = {
             referencedRelation: "shopping_runs";
             referencedColumns: ["id"];
           },
+          RecipeFk<"shopping_run_recipes_recipe_id_fkey">,
         ]
       >;
       weekly_menu_recipes: Table<

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { expiringSoon, suggestDays, urgencyOf } from "@/lib/planning";
+import { expiringSoon, pantryUsedBy, suggestDays, urgencyOf } from "@/lib/planning";
 import { scaleQuantity, shoppingQuantity } from "@/lib/servings";
 import { daysUntil, formatExpiry, shelfLifeDays, suggestExpiry } from "@/lib/shelf-life";
 
@@ -122,6 +122,27 @@ describe("suggestDays", () => {
       plan.map((entry) => entry.day),
       ["dimanche", "dimanche", null, null],
     );
+  });
+});
+
+describe("pantryUsedBy", () => {
+  it("sort du frigo ce que la recette consomme", () => {
+    const used = pantryUsedBy(["Pavés de saumon frais", "Lentilles cuites"], pantry);
+    assert.deepEqual(used.map((item) => item.name), ["Pavés de saumon frais"]);
+  });
+
+  it("reconnaît le singulier et les précisions du libellé", () => {
+    const used = pantryUsedBy(["Courgette"], pantry);
+    assert.deepEqual(used.map((item) => item.name), ["Courgettes"]);
+  });
+
+  it("ignore ce qui est déjà soldé", () => {
+    const soldé = pantry.map((item) => ({ ...item, is_used: true }));
+    assert.deepEqual(pantryUsedBy(["Courgette"], soldé), []);
+  });
+
+  it("ne rend rien quand aucun ingrédient ne correspond", () => {
+    assert.deepEqual(pantryUsedBy(["Farine de blé"], pantry), []);
   });
 });
 

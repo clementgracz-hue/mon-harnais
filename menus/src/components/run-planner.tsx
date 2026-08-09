@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Beef, CalendarClock, Leaf, UtensilsCrossed } from "lucide-react";
+import { Beef, CalendarClock, Check, Leaf, UtensilsCrossed } from "lucide-react";
 
 import { StarRating } from "@/components/star-rating";
+import { pantryUsedBy, type PantryEntry } from "@/lib/planning";
 import { DAY_CAPACITY, hasRoom, placeMeals } from "@/lib/schedule";
 import { formatExpiry } from "@/lib/shelf-life";
 import { createClient } from "@/lib/supabase/client";
@@ -20,23 +21,35 @@ export type RunMeal = ShoppingRunRecipe & {
     rating: number | null;
     prep_time: number | null;
     cook_time: number | null;
+    recipe_ingredients?: { name: string }[];
   } | null;
+  shopping_runs?: { created_at: string; week_number: number } | null;
 };
 
 type Props = {
   meals: RunMeal[];
   /** DLC la plus proche par recette, et le produit qui l'impose. */
   urgency: Record<string, { expiresOn: string | null; because: string | null }>;
+  /** Le frigo : validé un repas, ce qu'il consomme en sort. */
+  pantry: PantryEntry[];
+  /** Commande la plus récente : les repas plus anciens sont signalés. */
+  currentRunId: string;
   author: string;
 };
 
 /**
- * Le planning de la commande en cours de consommation : un repas par jour,
- * deux le week-end. Le jour et le drapeau végétal sont portés par la commande,
- * pas par la recette — la même recette peut revenir un autre jour la semaine
- * suivante.
+ * Le planning des repas à cuisiner : un par jour, deux le week-end. Un repas
+ * y reste tant qu'il n'est pas validé, même si un nouveau Drive est arrivé.
+ * Le jour et le drapeau végétal sont portés par la commande, pas par la
+ * recette — la même recette peut revenir un autre jour la semaine suivante.
  */
-export function RunPlanner({ meals, urgency, author }: Props) {
+export function RunPlanner({
+  meals,
+  urgency,
+  pantry,
+  currentRunId,
+  author,
+}: Props) {
   const router = useRouter();
   const [rows, setRows] = useState(meals);
 
@@ -86,6 +99,38 @@ export function RunPlanner({ meals, urgency, author }: Props) {
     router.refresh();
   }
 
+  /**
+   * Repas cuisiné : il quitte le planning et ce qu'il a consommé sort du
+   * frigo, comme le bouton des produits qui périment.
+   */
+  async function validate(meal: RunMeal) {
+    setRows((current) => current.filter((row) => row.id !== meal.id));
+
+    const supabase = createClient();
+    const used = pantryUsedBy(
+      (meal.recipes?.recipe_ingredients ?? []).map((item) => item.name),
+      pantry,
+    );
+
+    await Promise.all([
+      supabase
+        .from("shopping_run_recipes")
+        .update({ cooked_at: new Date().toISOString(), cooked_by: author })
+        .eq("id", meal.id),
+      used.length > 0
+        ? supabase
+            .from("pantry_items")
+            .update({ is_used: true })
+            .in(
+              "id",
+              used.map((item) => item.id),
+            )
+        : Promise.resolve(),
+    ]);
+
+    router.refresh();
+  }
+
   function card(meal: RunMeal) {
     return (
       <MealCard
@@ -93,9 +138,11 @@ export function RunPlanner({ meals, urgency, author }: Props) {
         meal={meal}
         meals={rows}
         urgency={meal.recipe_id ? urgency[meal.recipe_id] : undefined}
+        carriedOver={meal.run_id !== currentRunId}
         onDay={(day) => setDay(meal, day)}
         onVeg={() => toggleVeg(meal)}
         onRate={(rating) => rate(meal, rating)}
+        onValidate={() => validate(meal)}
       />
     );
   }
@@ -148,19 +195,30 @@ function MealCard({
   meal,
   meals,
   urgency,
+  carriedOver,
   onDay,
   onVeg,
   onRate,
+  onValidate,
 }: {
   meal: RunMeal;
   meals: RunMeal[];
   urgency?: { expiresOn: string | null; because: string | null };
+  carriedOver: boolean;
   onDay: (day: Day | null) => void;
   onVeg: () => void;
   onRate: (rating: number) => void;
+  onValidate: () => void;
 }) {
   const duration = meal.recipes
     ? formatDuration((meal.recipes.prep_time ?? 0) + (meal.recipes.cook_time ?? 0))
+    : null;
+
+  const orderedOn = meal.shopping_runs
+    ? new Date(meal.shopping_runs.created_at).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "short",
+      })
     : null;
 
   return (
@@ -185,11 +243,14 @@ function MealCard({
             </span>
           )}
 
-          {meal.recipes && (
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {duration ?? "Durée non renseignée"}
-            </p>
-          )}
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {meal.recipes ? (duration ?? "Durée non renseignée") : null}
+            {carriedOver && orderedOn && (
+              <span className="ml-1 rounded bg-muted px-1.5 py-0.5">
+                commande du {orderedOn}
+              </span>
+            )}
+          </p>
 
           {urgency?.expiresOn && (
             <p className="mt-1 flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-400">
@@ -209,6 +270,16 @@ function MealCard({
             />
           )}
         </div>
+
+        <button
+          type="button"
+          onClick={onValidate}
+          aria-label={`Marquer ${meal.title} comme cuisiné`}
+          title="Repas cuisiné"
+          className="h-9 w-9 shrink-0 self-start rounded-full border border-emerald-300 text-emerald-700 dark:border-emerald-800 dark:text-emerald-400"
+        >
+          <Check className="mx-auto h-4 w-4" />
+        </button>
       </div>
 
       <div className="flex gap-1 overflow-x-auto px-3">

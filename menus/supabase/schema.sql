@@ -232,6 +232,15 @@ create table if not exists public.shopping_run_recipes (
 
 create index if not exists shopping_run_recipes_run_idx on public.shopping_run_recipes (run_id);
 
+-- Un repas reste au planning tant qu'il n'a pas été cuisiné, même si un
+-- nouveau Drive est arrivé entre-temps.
+alter table public.shopping_run_recipes add column if not exists cooked_at timestamptz;
+alter table public.shopping_run_recipes add column if not exists cooked_by text;
+
+create index if not exists shopping_run_recipes_todo_idx
+  on public.shopping_run_recipes (cooked_at)
+  where cooked_at is null;
+
 -- ---------------------------------------------------------------------------
 --  Clôture des courses, en une transaction
 --
