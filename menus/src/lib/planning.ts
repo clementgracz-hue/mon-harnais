@@ -25,16 +25,29 @@ export type RecipeUrgency = {
   because: string | null;
 };
 
+/** Mots significatifs d'un libellé, au singulier, parenthèses ouvertes. */
+function keywords(value: string) {
+  return normalizeName(value)
+    .replace(/[()[\]]/g, " ")
+    .split(/[\s,'’-]+/)
+    .map((word) => word.replace(/s$/, ""))
+    .filter((word) => word.length > 2);
+}
+
 /**
- * Un ingrédient est considéré présent au frigo si son nom normalisé recouvre
- * celui d'un produit rangé, dans un sens ou dans l'autre : « Courgette » de la
- * recette et « Courgettes bio » du frigo doivent se reconnaître.
+ * Un ingrédient est présent au frigo si tous les mots du libellé le plus
+ * court se retrouvent dans l'autre : « Pavé de saumon » reconnaît « Pavés de
+ * saumon frais », et « Courgette » reconnaît « Courgettes ». L'égalité est
+ * exigée mot à mot — comparer des sous-chaînes ferait passer « Pâtes » pour
+ * de la « Patate douce ».
  */
 function matches(ingredient: string, pantryName: string) {
-  const a = normalizeName(ingredient);
-  const b = normalizeName(pantryName);
-  if (!a || !b) return false;
-  return a === b || a.includes(b) || b.includes(a);
+  const a = keywords(ingredient);
+  const b = keywords(pantryName);
+  if (a.length === 0 || b.length === 0) return false;
+
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  return short.every((word) => long.includes(word));
 }
 
 /**

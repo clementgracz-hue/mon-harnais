@@ -144,6 +144,21 @@ describe("pantryUsedBy", () => {
   it("ne rend rien quand aucun ingrédient ne correspond", () => {
     assert.deepEqual(pantryUsedBy(["Farine de blé"], pantry), []);
   });
+
+  it("reconnaît un libellé plus précis au frigo", () => {
+    const frigo = [
+      { id: "5", name: "Pavés de saumon frais", expires_on: null, is_used: false },
+    ];
+    assert.equal(pantryUsedBy(["Pavé de saumon"], frigo).length, 1);
+  });
+
+  it("ne confond pas deux produits qui commencent pareil", () => {
+    const frigo = [
+      { id: "6", name: "Patate douce", expires_on: null, is_used: false },
+      { id: "7", name: "Crème liquide", expires_on: null, is_used: false },
+    ];
+    assert.deepEqual(pantryUsedBy(["Pâtes", "Crème fraîche"], frigo), []);
+  });
 });
 
 describe("expiringSoon", () => {

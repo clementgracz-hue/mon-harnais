@@ -39,6 +39,12 @@ export async function updateSession(request: NextRequest) {
   );
 
   if (!user && !isPublic) {
+    // Une requête d'API attend du JSON : la rediriger vers la page de
+    // connexion lui renvoie du HTML, que l'appelant ne sait pas lire.
+    if (request.nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+    }
+
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", request.nextUrl.pathname);

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus, ShoppingCart } from "lucide-react";
+import { Plus, Refrigerator, ShoppingCart } from "lucide-react";
 
 import { AddRecipeDialog } from "@/components/add-recipe-dialog";
 import { PageHeader } from "@/components/page-header";
@@ -94,6 +94,13 @@ export default async function RecipesPage() {
           <Link href="/courses">
             <ShoppingCart className="h-5 w-5" aria-hidden />
             Générer la liste de courses
+          </Link>
+        </Button>
+
+        <Button asChild variant="outline" size="lg" className="w-full">
+          <Link href="/recettes/frigo">
+            <Refrigerator className="h-5 w-5" aria-hidden />
+            Cuisiner le frigo
           </Link>
         </Button>
       </div>

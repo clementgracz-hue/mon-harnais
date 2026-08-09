@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Check, Loader2, Plus, Search } from "lucide-react";
 
 import { RecipeCard, type RecipeCardData } from "@/components/recipe-card";
 import { Input } from "@/components/ui/input";
-import { getOrCreateMenu } from "@/lib/menu";
-import { createClient } from "@/lib/supabase/client";
-import { cn, getIsoWeek } from "@/lib/utils";
+import { useWeekSelection } from "@/components/use-week-selection";
+import { cn } from "@/lib/utils";
 
 type Props = {
   recipes: RecipeCardData[];
@@ -18,11 +16,9 @@ type Props = {
 };
 
 export function RecipeList({ recipes, selectedIds }: Props) {
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [selected, setSelected] = useState(() => new Set(selectedIds));
-  const [pending, setPending] = useState<string | null>(null);
+  const { selected, pending, toggle } = useWeekSelection(selectedIds);
 
   const tags = useMemo(
     () => [...new Set(recipes.flatMap((recipe) => recipe.tags))].sort(),
@@ -37,51 +33,6 @@ export function RecipeList({ recipes, selectedIds }: Props) {
       return matchesQuery && matchesTag;
     });
   }, [recipes, query, activeTag]);
-
-  /** Ajoute ou retire la recette du menu de la semaine, en un geste. */
-  async function toggleWeek(recipe: RecipeCardData) {
-    if (pending) return;
-    setPending(recipe.id);
-
-    const isSelected = selected.has(recipe.id);
-    setSelected((current) => {
-      const next = new Set(current);
-      if (isSelected) next.delete(recipe.id);
-      else next.add(recipe.id);
-      return next;
-    });
-
-    try {
-      const supabase = createClient();
-      const { week, year } = getIsoWeek();
-      const menu = await getOrCreateMenu(supabase, week, year);
-
-      if (isSelected) {
-        await supabase
-          .from("weekly_menu_recipes")
-          .delete()
-          .eq("menu_id", menu.id)
-          .eq("recipe_id", recipe.id);
-      } else {
-        await supabase.from("weekly_menu_recipes").insert({
-          menu_id: menu.id,
-          recipe_id: recipe.id,
-          is_kid_friendly_veg: recipe.veg ?? false,
-        });
-      }
-      router.refresh();
-    } catch {
-      // Échec réseau : on rend l'état d'origine plutôt que de mentir.
-      setSelected((current) => {
-        const next = new Set(current);
-        if (isSelected) next.add(recipe.id);
-        else next.delete(recipe.id);
-        return next;
-      });
-    } finally {
-      setPending(null);
-    }
-  }
 
   return (
     <div className="space-y-4 p-4">
@@ -154,7 +105,7 @@ export function RecipeList({ recipes, selectedIds }: Props) {
                       type="button"
                       onClick={(event) => {
                         event.preventDefault();
-                        void toggleWeek(recipe);
+                        void toggle(recipe);
                       }}
                       disabled={isPending}
                       aria-pressed={isSelected}
