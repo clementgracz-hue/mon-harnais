@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Refrigerator, Snowflake } from "lucide-react";
 
+import { DictationBar } from "@/components/dictation-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AISLE_EMOJI } from "@/lib/aisles";
@@ -147,8 +148,26 @@ export function FridgeForm({
 
   const kept = drafts.filter((draft) => draft.keep).length;
 
+  /** Une phrase dictée ne redate que les produits qu'elle nomme. */
+  function applyDictation(changes: Array<{ index: number; date: string }>) {
+    if (changes.length === 0) return;
+    const byIndex = new Map(changes.map((change) => [change.index, change.date]));
+
+    setDrafts((current) =>
+      current.map((row, index) => {
+        const date = byIndex.get(index);
+        return date ? { ...row, expiresOn: date, keep: true } : row;
+      }),
+    );
+  }
+
   return (
     <div className="space-y-4">
+      <DictationBar
+        names={drafts.map((draft) => draft.item.name)}
+        onApply={applyDictation}
+      />
+
       {alreadyStored > 0 && (
         <p className="rounded-xl bg-muted px-4 py-3 text-sm text-muted-foreground">
           {alreadyStored} produit{alreadyStored > 1 ? "s" : ""} de cette livraison
