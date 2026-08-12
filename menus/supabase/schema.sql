@@ -402,22 +402,28 @@ create policy "recipe_photos_write" on storage.objects
 
 -- ============================================================================
 --  Seed — fonds de roulement de départ
+--
+--  Uniquement sur une base neuve : une liste déjà tenue à la main ne doit pas
+--  se voir réimposer les valeurs d'usine à chaque rejeu du schéma.
 -- ============================================================================
-insert into public.staple_products (name, category, is_frequent) values
-  ('Jus d''orange',        'Boissons',            true),
-  ('Café en grains',       'Épicerie sucrée',     true),
-  ('Lait',                 'Crémerie',            true),
-  ('Beurre',               'Crémerie',            true),
-  ('Œufs',                 'Crémerie',            true),
-  ('Pain de mie',          'Pain & Pâtisserie',   true),
-  ('Pâtes',                'Épicerie salée',      true),
-  ('Riz',                  'Épicerie salée',      true),
-  ('Huile d''olive',       'Épicerie salée',      true),
-  ('Papier toilette',      'Entretien & Maison',  true),
-  ('Liquide vaisselle',    'Entretien & Maison',  true),
-  ('Lessive',              'Entretien & Maison',  true),
-  ('Couches',              'Bébé',                true),
-  ('Lingettes bébé',       'Bébé',                true),
-  ('Litière chat',         'Animalerie',          true),
-  ('Croquettes chat',      'Animalerie',          true)
-on conflict (name) do nothing;
+insert into public.staple_products (name, category, is_frequent)
+select seed.name, seed.category::aisle_category, true
+  from (values
+    ('Jus d''orange',        'Boissons'),
+    ('Café en grains',       'Épicerie sucrée'),
+    ('Lait',                 'Crémerie'),
+    ('Beurre',               'Crémerie'),
+    ('Œufs',                 'Crémerie'),
+    ('Pain de mie',          'Pain & Pâtisserie'),
+    ('Pâtes',                'Épicerie salée'),
+    ('Riz',                  'Épicerie salée'),
+    ('Huile d''olive',       'Épicerie salée'),
+    ('Papier toilette',      'Entretien & Maison'),
+    ('Liquide vaisselle',    'Entretien & Maison'),
+    ('Lessive',              'Entretien & Maison'),
+    ('Couches',              'Bébé'),
+    ('Lingettes bébé',       'Bébé'),
+    ('Litière chat',         'Animalerie'),
+    ('Croquettes chat',      'Animalerie')
+  ) as seed(name, category)
+ where not exists (select 1 from public.staple_products);

@@ -62,6 +62,15 @@ describe("guessAisle", () => {
     assert.equal(guessAisle("Céleri-rave"), "Fruits & Légumes");
   });
 
+  it("range les produits du fond de roulement", () => {
+    assert.equal(guessAisle("Mouchoirs en papier confort ultra soft"), "Hygiène & Beauté");
+    assert.equal(guessAisle("Lime"), "Fruits & Légumes");
+    // « lime » est aussi un outil : le rayon non alimentaire passe avant.
+    assert.equal(guessAisle("Lime à ongles"), "Hygiène & Beauté");
+    assert.equal(guessAisle("Skyr protéiné 0% MG"), "Crémerie");
+    assert.equal(guessAisle("Lait bébé en poudre 3ème âge bio"), "Bébé");
+  });
+
   it("retombe sur « Autres » quand rien ne correspond", () => {
     assert.equal(guessAisle("Truc inconnu"), "Autres");
   });

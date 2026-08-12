@@ -42,7 +42,7 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
   ["Animalerie", ["litière", "croquette", "pâtée", "chat", "chien"]],
   [
     "Hygiène & Beauté",
-    ["dentifrice", "shampoing", "savon", "gel douche", "déodorant", "rasoir", "coton tige", "brosse à dents"],
+    ["dentifrice", "shampoing", "savon", "gel douche", "déodorant", "rasoir", "coton tige", "brosse à dents", "mouchoir", "lime à ongles"],
   ],
   [
     "Entretien & Maison",
@@ -119,7 +119,7 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "endive", "panais", "patate douce", "potimarron", "butternut", "céleri",
       "abricot", "nectarine", "pamplemousse", "framboise", "cerise", "rhubarbe",
       "chou blanc", "chou-fleur", "gingembre", "menthe", "ciboulette",
-      "laitue", "mâche", "roquette",
+      "laitue", "mâche", "roquette", "lime",
     ],
   ],
 ];
