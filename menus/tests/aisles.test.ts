@@ -69,6 +69,13 @@ describe("guessAisle", () => {
     assert.equal(guessAisle("Lime à ongles"), "Hygiène & Beauté");
     assert.equal(guessAisle("Skyr protéiné 0% MG"), "Crémerie");
     assert.equal(guessAisle("Lait bébé en poudre 3ème âge bio"), "Bébé");
+    assert.equal(guessAisle("Petits suisses"), "Crémerie");
+    assert.equal(guessAisle("Cappuccino soluble"), "Épicerie sucrée");
+    // Le jus de citron est un condiment ; le jus d'orange, une boisson.
+    assert.equal(guessAisle("Jus de citron bio"), "Épicerie salée");
+    assert.equal(guessAisle("Jus d'orange avec pulpe"), "Boissons");
+    // La compote l'emporte sur le fruit qui la compose.
+    assert.equal(guessAisle("Compote pomme sans sucre bio"), "Épicerie sucrée");
   });
 
   it("retombe sur « Autres » quand rien ne correspond", () => {

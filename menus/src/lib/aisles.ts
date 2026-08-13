@@ -66,7 +66,7 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "olive", "tomate séchée", "houmous", "ketchup", "sauce tomate", "marron",
       "châtaigne", "chips de légumes", "chips de tortillas", "tortilla",
       "graines de sésame", "graines de chia", "pignon de pin", "vinaigre",
-      "crème de balsamique", "crème balsamique",
+      "crème de balsamique", "crème balsamique", "jus de citron",
     ],
   ],
   [
@@ -75,6 +75,7 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "sucre", "chocolat", "café", "thé", "confiture", "miel", "céréales", "biscuit",
       "levure", "vanille", "compote", "pâte à tartiner", "cacao", "noisette", "noix",
       "amande", "pistache", "avoine", "corn flakes", "sirop d'érable", "flocons",
+      "cappuccino", "chicorée",
     ],
   ],
   [
@@ -105,6 +106,7 @@ const KEYWORDS: Array<[Aisle, string[]]> = [
       "burrata", "brie", "reblochon", "raclette", "mont d'or", "rocamadour",
       "cheddar", "mascarpone", "crottin", "râpé végétal", "ravioles", "ravioli",
       "crozets", "lasagnes", "galette bretonne", "boisson végétale",
+      "petit suisse", "faisselle",
     ],
   ],
   [
