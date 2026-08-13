@@ -6041,5 +6041,169 @@
       "Ajoutez un peu d'eau si la texture est trop épaisse.",
       "Servez la soupe avec les chips de légumes par dessus, c'est prêt !"
     ]
+  },
+  {
+    "titre": "Hachis parmentier",
+    "description": "586 kcal/portion · Note 4,7/5 (2170 avis)",
+    "lien": "https://jow.fr/recipes/hachis-parmentier-8d313toqclf509cd10gp",
+    "photo": "https://static.jow.fr/1024x1024/recipes/rXToxZSztduzOQ.png",
+    "portions": 2,
+    "platEntier": false,
+    "preparation": 8,
+    "cuisson": 35,
+    "etiquettes": [
+      "Jow",
+      "Four"
+    ],
+    "ingredients": [
+      {
+        "nom": "Pommes de terre",
+        "quantite": 400,
+        "unite": "g"
+      },
+      {
+        "nom": "Bœuf (haché surgelé)",
+        "quantite": 250,
+        "unite": "g"
+      },
+      {
+        "nom": "Oignon jaune",
+        "quantite": 0.5,
+        "unite": "pièce"
+      },
+      {
+        "nom": "Lait",
+        "quantite": 100,
+        "unite": "ml"
+      },
+      {
+        "nom": "Fromage râpé",
+        "quantite": 20,
+        "unite": "g"
+      },
+      {
+        "nom": "Beurre",
+        "quantite": 20,
+        "unite": "g"
+      }
+    ],
+    "etapes": [
+      "Préchauffez le four à 180°C. Épluchez puis coupez les pommes de terre en morceaux.",
+      "Dans une casserole d'eau bouillante salée, ajoutez les pommes de terre. Faites-les cuire 15 minutes, sur feu moyen.",
+      "Pendant ce temps, épluchez puis émincez les oignons.",
+      "Faites chauffer un filet d'huile d'olive dans une poêle, sur feu moyen. Ajoutez les oignons et le bœuf haché. Faites revenir le tout 5 à 6 minutes, en mélangeant pour détacher les morceaux. Salez et poivrez. Réservez hors du feu.",
+      "Vérifiez la cuisson des pommes de terre, puis égouttez-les.",
+      "Salez, poivrez puis écrasez les pommes de terre à l'aide d'une fourchette ou d'un presse-purée. Ajoutez le beurre et le lait. Mélangez.",
+      "Beurrez un plat allant au four (le nôtre fait 28 x 19 cm). Répartissez le bœuf haché, puis étalez la purée uniformément sur le dessus. Parsemez le tout de fromage râpé, puis enfournez 20 minutes à 180°C.",
+      "Une fois le hachis parmentier bien doré, sortez le plat du four. Servez-le dans une assiette accompagné d'une salade verte assaisonnée selon vos goûts. C'est prêt !"
+    ]
+  },
+  {
+    "titre": "Salade au poulet pané & sauce pesto",
+    "description": "541 kcal/portion · Note 4,7/5 (200 avis)",
+    "lien": "https://jow.fr/recipes/salade-au-poulet-pane-et-sauce-pesto-9ax4mgb64113hjb30yy5",
+    "photo": "https://static.jow.fr/1024x1024/recipes/iCdl3zOQoXzr5Q.jpg",
+    "portions": 2,
+    "platEntier": false,
+    "preparation": 3,
+    "cuisson": 6,
+    "etiquettes": [
+      "Jow",
+      "Express"
+    ],
+    "ingredients": [
+      {
+        "nom": "Poulet (pané)",
+        "quantite": 2,
+        "unite": "pièce"
+      },
+      {
+        "nom": "Salade (mélange)",
+        "quantite": 4,
+        "unite": "poignée"
+      },
+      {
+        "nom": "Tomates cerises",
+        "quantite": 200,
+        "unite": "g"
+      },
+      {
+        "nom": "Fromage à trous",
+        "quantite": 60,
+        "unite": "g"
+      },
+      {
+        "nom": "Sauce pesto",
+        "quantite": 2,
+        "unite": "c. à c."
+      },
+      {
+        "nom": "Citron jaune",
+        "quantite": 2,
+        "unite": "quartier"
+      }
+    ],
+    "etapes": [
+      "Lavez puis coupez les tomates cerises en deux.",
+      "Faites chauffer une poêle, sur feu moyen. Ajoutez le poulet pané. Faites-le griller 3 minutes de chaque côté, jusqu'à ce qu'il soit bien doré. Coupez-le en morceaux.",
+      "Coupez le fromage en petits dés.",
+      "Préparez la sauce. Dans un bol, mélangez : le pesto, le jus de citron et un petit filet d'huile d'olive.",
+      "Servez la salade dans une assiette creuse ou un plat, avec les tomates cerises, le poulet pané et le fromage. Nappez le tout de sauce au pesto. C'est prêt !"
+    ]
+  },
+  {
+    "titre": "Salade haricots verts, feta & croûtons",
+    "description": "383 kcal/portion · Note 4,6/5 (237 avis)",
+    "lien": "https://jow.fr/recipes/salade-haricots-verts-feta-et-croutons-8qx51me72msjdupa1244",
+    "photo": "https://static.jow.fr/1024x1024/recipes/SBOitz8s1njiRg.jpg",
+    "portions": 2,
+    "platEntier": false,
+    "preparation": 6,
+    "cuisson": 12,
+    "etiquettes": [
+      "Jow",
+      "Express"
+    ],
+    "ingredients": [
+      {
+        "nom": "Haricot vert (surgelé)",
+        "quantite": 300,
+        "unite": "g"
+      },
+      {
+        "nom": "Tomates séchées",
+        "quantite": 80,
+        "unite": "g"
+      },
+      {
+        "nom": "Feta",
+        "quantite": 80,
+        "unite": "g"
+      },
+      {
+        "nom": "Pain de campagne (non tranché)",
+        "quantite": 100,
+        "unite": "g"
+      },
+      {
+        "nom": "Oignon jaune",
+        "quantite": 0.5,
+        "unite": "pièce"
+      },
+      {
+        "nom": "Persil (frais)",
+        "quantite": 0.2,
+        "unite": "bouquet"
+      }
+    ],
+    "etapes": [
+      "Dans une casserole d'eau bouillante, faites cuire les haricots verts pendant environ 3 minutes puis réservez.",
+      "Pendant ce temps, épluchez puis coupez l'oignon en fines lamelles. Coupez les tomates séchées en petits morceaux.",
+      "Dans une poêle, ajoutez une noisette de beurre puis faites revenir les oignons pendant environ 5 minutes à feu moyen. Ajoutez un filet d'eau si jamais cela accroche.",
+      "Pendant ce temps, déchirez votre pain de façon à obtenir des petits morceaux.",
+      "Une fois que les oignons sont bien cuits, retirez-les de la poêle. Ajoutez une noisette de beurre, puis faites revenir les morceaux de pain pendant 4 minutes, le temps qu'ils soient bien dorés.",
+      "Dans une assiette, ajoutez les haricots verts, les oignons, les tomates séchées, les croûtons puis mélangez bien.",
+      "Ajoutez ensuite la feta émiettée, un trait d'huile d'olive, salez et poivrez. Finissez par quelques feuilles de persil si vous en avez. C'est prêt !"
+    ]
   }
 ]
