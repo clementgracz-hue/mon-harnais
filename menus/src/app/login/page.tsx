@@ -41,6 +41,29 @@ function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {/* Posé par la middleware quand Supabase n'a pas répondu à temps. */}
+      {params.get("indisponible") && (
+        <div
+          role="status"
+          className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+        >
+          <p className="font-semibold">La base de données ne répond pas.</p>
+          <p className="mt-1 text-xs">
+            Un projet Supabase gratuit se met en veille après une semaine sans
+            requête. Rouvre-le depuis{" "}
+            <a
+              href="https://supabase.com/dashboard"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline"
+            >
+              supabase.com/dashboard
+            </a>{" "}
+            (bouton « Restore »), puis réessaie dans une minute.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
         <Input
