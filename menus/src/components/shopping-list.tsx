@@ -21,6 +21,7 @@ import {
   consolidate,
   countItems,
   preferenceNote,
+  toCoworkBrief,
   toDriveText,
   COPY_FORMATS,
   COPY_FORMAT_HINTS,
@@ -67,6 +68,8 @@ function ClosedNotice({ runId }: { runId: string }) {
 
 type Props = {
   items: RawItem[];
+  /** Tous les récurrents, cochés ou non : sert au briefing Cowork. */
+  habits: string[];
   /** Clé de persistance des cases cochées (numéro de semaine). */
   storageKey: string;
   week: number;
@@ -74,7 +77,14 @@ type Props = {
   closedBy: string;
 };
 
-export function ShoppingList({ items, storageKey, week, year, closedBy }: Props) {
+export function ShoppingList({
+  items,
+  habits,
+  storageKey,
+  week,
+  year,
+  closedBy,
+}: Props) {
   const router = useRouter();
   const [sources, setSources] = useState<Set<ShoppingSource>>(
     () => new Set(SOURCE_ORDER),
@@ -134,11 +144,11 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
   const remaining = total - checked.size;
 
   async function copyList() {
-    const text = toDriveText(sections, {
-      skip: checked,
-      note: preferenceNote(preferences),
-      format,
-    });
+    const note = preferenceNote(preferences);
+    const text =
+      format === "cowork"
+        ? toCoworkBrief(sections, { skip: checked, note, habits })
+        : toDriveText(sections, { skip: checked, note, format });
     try {
       await navigator.clipboard.writeText(text);
     } catch {

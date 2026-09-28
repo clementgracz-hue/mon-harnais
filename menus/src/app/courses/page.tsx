@@ -49,7 +49,7 @@ export default async function ShoppingPage() {
             .eq("menu_id", menu.id)
         : Promise.resolve({ data: [] as MenuRow[] }),
       supabase.from("shopping_wishlist").select("*").eq("is_checked", false),
-      supabase.from("staple_products").select("*").eq("is_selected", true),
+      supabase.from("staple_products").select("*").order("name"),
     ]);
 
   const {
@@ -82,14 +82,20 @@ export default async function ShoppingPage() {
       aisle: item.aisle_category,
       source: "pense-bête" as const,
     })),
-    ...((staples ?? []) as StapleProduct[]).map((staple) => ({
-      name: staple.name,
-      quantity: null,
-      unit: null,
-      aisle: staple.category,
-      source: "récurrent" as const,
-    })),
+    ...((staples ?? []) as StapleProduct[])
+      .filter((staple) => staple.is_selected)
+      .map((staple) => ({
+        name: staple.name,
+        quantity: null,
+        unit: null,
+        aisle: staple.category,
+        source: "récurrent" as const,
+      })),
   ];
+
+  // Les habitués, cochés ou non : ce que Cowork peut proposer, et le style
+  // dans lequel choisir un produit que la liste ne précise pas.
+  const habits = ((staples ?? []) as StapleProduct[]).map((staple) => staple.name);
 
   return (
     <main className="pb-nav">
@@ -106,6 +112,7 @@ export default async function ShoppingPage() {
       />
       <ShoppingList
         items={items}
+        habits={habits}
         storageKey={`courses-${year}-${week}`}
         week={week}
         year={year}

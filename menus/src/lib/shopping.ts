@@ -229,7 +229,7 @@ export function consolidate(items: RawItem[]): ShoppingSection[] {
  * - `assistant` : une consigne suivie des quantités, pour un assistant à qui
  *   on parle en français.
  */
-export const COPY_FORMATS = ["rayons", "noms", "assistant"] as const;
+export const COPY_FORMATS = ["rayons", "noms", "assistant", "cowork"] as const;
 
 export type CopyFormat = (typeof COPY_FORMATS)[number];
 
@@ -237,12 +237,14 @@ export const COPY_FORMAT_LABELS: Record<CopyFormat, string> = {
   rayons: "Par rayon",
   noms: "Noms seuls",
   assistant: "Pour l'assistant",
+  cowork: "Pour Cowork",
 };
 
 export const COPY_FORMAT_HINTS: Record<CopyFormat, string> = {
   rayons: "Groupée avec les quantités, pour saisir article par article.",
   noms: "Un nom par ligne, rien d'autre : pour l'ajout en masse du Drive.",
   assistant: "Une phrase et les quantités, pour Hopla ou un chatbot du Drive.",
+  cowork: "La consigne complète : quoi acheter, quoi proposer, quoi valider.",
 };
 
 /** Libellé tel qu'on le taperait dans une barre de recherche. */
@@ -354,6 +356,132 @@ export function preferenceNote(preferences: Iterable<Preference>) {
   return notes.length === 0 ? "" : `Préférences : ${notes.join(" · ")}`;
 }
 
+/** Mots significatifs d'un libellé, au singulier, parenthèses ouvertes. */
+export function keywords(value: string) {
+  return normalizeName(value)
+    .replace(/[()[\]]/g, " ")
+    .split(/[\s,'’-]+/)
+    .map((word) => word.replace(/s$/, ""))
+    .filter((word) => word.length > 2);
+}
+
+/**
+ * Deux libellés désignent-ils le même produit ? Tous les mots du plus court
+ * doivent se retrouver dans l'autre, et les deux doivent commencer par le
+ * même mot : « Feta » reconnaît « Feta AOP grecque », mais « Pommes de terre »
+ * ne se confond pas avec des « Chips pommes de terre », dont le nom dit bien
+ * qu'il s'agit d'autre chose. En français le produit se nomme en premier, le
+ * reste le précise.
+ */
+export function sameProduct(a: string, b: string) {
+  const left = keywords(a);
+  const right = keywords(b);
+  if (left.length === 0 || right.length === 0) return false;
+  if (left[0] !== right[0]) return false;
+
+  const [short, long] = left.length <= right.length ? [left, right] : [right, left];
+  return short.every((word) => long.includes(word));
+}
+
 export function countItems(sections: ShoppingSection[]) {
   return sections.reduce((total, section) => total + section.items.length, 0);
+}
+
+/**
+ * Consigne complète pour un agent qui pilote le Drive dans le navigateur.
+ *
+ * Elle porte quatre choses que la seule liste ne dit pas : ce qu'il peut
+ * ajouter seul et ce qu'il doit faire valider, les habitués à proposer parce
+ * qu'on les oublie, le style à suivre quand un produit n'est pas précisé, et
+ * le compte rendu attendu à la fin — substitutions et manquants.
+ */
+export function toCoworkBrief(
+  sections: ShoppingSection[],
+  options: {
+    skip?: Set<string>;
+    note?: string;
+    /** Les récurrents, tous : ceux du panier et ceux laissés de côté. */
+    habits?: string[];
+  } = {},
+) {
+  const { skip, note, habits = [] } = options;
+
+  const wanted = sections.flatMap((section) =>
+    section.items.filter((item) => !skip?.has(item.key)),
+  );
+
+  const lines = wanted.map((item) => {
+    const amount = item.amounts.join(" + ");
+    return amount ? `${item.name} — ${amount}` : item.name;
+  });
+
+  // Un habitué se range dans l'une des deux colonnes : soit la liste le
+  // demande déjà et il dit quelle référence prendre, soit il est absent et
+  // vaut la peine d'être proposé.
+  const known = new Map<string, string>();
+  const toSuggest: string[] = [];
+
+  for (const habit of habits) {
+    const line = sections
+      .flatMap((section) => section.items)
+      .find((item) => sameProduct(item.name, habit));
+
+    if (!line) toSuggest.push(habit);
+    else if (normalizeName(line.name) !== normalizeName(habit)) {
+      known.set(line.name, habit);
+    }
+  }
+
+  // Sans habitués, la section « À me proposer » n'existe pas : ne pas y
+  // renvoyer, sous peine d'envoyer l'agent chercher une liste absente.
+  const scope = toSuggest.length
+    ? "- n'ajoute rien qui ne soit ni dans « À acheter » ni dans « À me proposer »."
+    : "- n'ajoute rien qui ne soit pas dans « À acheter ».";
+
+  const blocks: string[] = [
+    "Je suis déjà connecté à mon Drive dans le navigateur. Remplis mon panier " +
+      "avec la liste « À acheter » ci-dessous, en respectant les quantités. " +
+      "Ne valide pas la commande et ne choisis pas de créneau : je relis avant.",
+    [
+      "Ce que tu peux faire seul, et ce que tu dois me demander :",
+      "- correspondance évidente : ajoute sans me déranger ;",
+      "- produit introuvable à l'identique, grammage différent, lot, ou prix qui te",
+      "  semble anormal : propose-moi le produit et attends que je valide ;",
+      scope,
+    ].join("\n"),
+  ];
+
+  if (note?.trim()) {
+    blocks.push(
+      `Mes préférences : ${note.trim().replace(/^Préférences\s*:\s*/, "")}.`,
+    );
+  }
+
+  blocks.push(
+    [
+      "Préviens-moi dès que le panier est complet, et donne-moi alors :",
+      "- ce que tu as remplacé, et par quoi ;",
+      "- ce que tu n'as pas trouvé.",
+    ].join("\n"),
+  );
+
+  blocks.push(
+    `À acheter (${lines.length} article${lines.length > 1 ? "s" : ""}) :\n${lines.join("\n")}`,
+  );
+
+  if (known.size > 0) {
+    blocks.push(
+      "Pour ces lignes, prends la référence que j'achète d'habitude :\n" +
+        [...known].map(([line, habit]) => `${line} → ${habit}`).join("\n"),
+    );
+  }
+
+  if (toSuggest.length > 0) {
+    blocks.push(
+      "À me proposer, un par un, au cas où je les aurais oubliés — n'ajoute que " +
+        `ceux que j'accepte :\n${toSuggest.join("\n")}`,
+    );
+  }
+
+  return blocks.join("\n\n");
 }

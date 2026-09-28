@@ -1,4 +1,4 @@
-import { normalizeName } from "@/lib/shopping";
+import { sameProduct } from "@/lib/shopping";
 import { slotsFrom } from "@/lib/schedule";
 import { daysUntil } from "@/lib/shelf-life";
 import type { Day } from "@/lib/types/database";
@@ -25,29 +25,13 @@ export type RecipeUrgency = {
   because: string | null;
 };
 
-/** Mots significatifs d'un libellé, au singulier, parenthèses ouvertes. */
-function keywords(value: string) {
-  return normalizeName(value)
-    .replace(/[()[\]]/g, " ")
-    .split(/[\s,'’-]+/)
-    .map((word) => word.replace(/s$/, ""))
-    .filter((word) => word.length > 2);
-}
-
 /**
- * Un ingrédient est présent au frigo si tous les mots du libellé le plus
- * court se retrouvent dans l'autre : « Pavé de saumon » reconnaît « Pavés de
- * saumon frais », et « Courgette » reconnaît « Courgettes ». L'égalité est
- * exigée mot à mot — comparer des sous-chaînes ferait passer « Pâtes » pour
- * de la « Patate douce ».
+ * Un ingrédient est présent au frigo si les deux libellés désignent le même
+ * produit — même règle que l'appariement des courses, pour qu'un « Pavé de
+ * saumon » se reconnaisse partout de la même façon.
  */
 function matches(ingredient: string, pantryName: string) {
-  const a = keywords(ingredient);
-  const b = keywords(pantryName);
-  if (a.length === 0 || b.length === 0) return false;
-
-  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
-  return short.every((word) => long.includes(word));
+  return sameProduct(ingredient, pantryName);
 }
 
 /**

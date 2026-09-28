@@ -6,6 +6,8 @@ import {
   countItems,
   normalizeName,
   preferenceNote,
+  sameProduct,
+  toCoworkBrief,
   toDriveText,
   PREFERENCES,
   type RawItem,
@@ -235,6 +237,111 @@ describe("formats de copie", () => {
 
   it("« par rayon » reste le format par défaut", () => {
     assert.equal(toDriveText(sections), toDriveText(sections, { format: "rayons" }));
+  });
+});
+
+describe("sameProduct", () => {
+  it("reconnaît une référence plus précise", () => {
+    assert.ok(sameProduct("Feta", "Feta AOP grecque"));
+    assert.ok(sameProduct("Mouchoirs", "Mouchoirs en papier confort ultra soft"));
+    assert.ok(sameProduct("Pavé de saumon", "Pavés de saumon frais"));
+    assert.ok(sameProduct("Courgette", "Courgettes"));
+  });
+
+  it("refuse un produit dont le nom commence autrement", () => {
+    // Les mots de « pommes de terre » sont bien tous là, et pourtant.
+    assert.equal(
+      sameProduct("Pommes de terre", "Chips pommes de terre au chèvre"),
+      false,
+    );
+    assert.equal(sameProduct("Pâtes", "Patate douce"), false);
+    assert.equal(sameProduct("Crème fraîche", "Crème liquide"), false);
+  });
+
+  it("refuse un libellé sans mot significatif", () => {
+    assert.equal(sameProduct("", "Feta"), false);
+    assert.equal(sameProduct("de la", "Feta"), false);
+  });
+});
+
+describe("toCoworkBrief", () => {
+  const sections = consolidate([
+    recipeItem("Carottes", 500, "g", "Fruits & Légumes"),
+    recipeItem("Beurre demi-sel", null, null, "Crémerie"),
+  ]);
+
+  const habits = ["Beurre demi-sel", "Skyr protéiné 0% MG", "Lime"];
+
+  it("porte la liste, les quantités et le décompte", () => {
+    const brief = toCoworkBrief(sections, { habits });
+
+    assert.match(brief, /À acheter \(2 articles\) :/);
+    assert.match(brief, /^Carottes — 500 g$/m);
+  });
+
+  it("ne propose que les habitués absents du panier", () => {
+    const brief = toCoworkBrief(sections, { habits });
+    const suggestions = brief
+      .split("\n\n")
+      .find((block) => block.startsWith("À me proposer"))!;
+
+    // Le beurre est déjà à acheter : le proposer serait un doublon.
+    assert.doesNotMatch(suggestions, /Beurre demi-sel/);
+    assert.match(suggestions, /Skyr protéiné 0% MG/);
+    assert.match(suggestions, /Lime/);
+  });
+
+  it("demande de faire valider les cas douteux et de ne pas commander", () => {
+    const brief = toCoworkBrief(sections, { habits });
+
+    assert.match(brief, /attends que je valide/);
+    assert.match(brief, /Ne valide pas la commande/);
+    assert.match(brief, /Préviens-moi dès que le panier est complet/);
+    assert.match(brief, /ce que tu n'as pas trouvé/);
+  });
+
+  it("reprend les préférences pour le choix des produits", () => {
+    const brief = toCoworkBrief(sections, {
+      habits,
+      note: "Préférences : bio de préférence",
+    });
+
+    assert.match(brief, /Mes préférences : bio de préférence\./);
+  });
+
+  it("dit quelle référence prendre quand la ligne est plus vague", () => {
+    const brief = toCoworkBrief(consolidate([recipeItem("Feta", 80, "g", "Crémerie")]), {
+      habits: ["Feta AOP grecque", "Petits suisses"],
+    });
+    const suggestions = brief
+      .split("\n\n")
+      .find((block) => block.startsWith("À me proposer"))!;
+
+    assert.match(brief, /Feta → Feta AOP grecque/);
+    // Le produit habituel n'est alors plus à proposer : il est déjà au panier.
+    assert.doesNotMatch(suggestions, /Feta AOP grecque/);
+    assert.match(suggestions, /Petits suisses/);
+  });
+
+  it("ne se paraphrase pas quand le libellé est déjà le bon", () => {
+    const brief = toCoworkBrief(sections, { habits: ["Beurre demi-sel"] });
+    assert.doesNotMatch(brief, /référence que j'achète/);
+  });
+
+  it("se passe d'habitudes", () => {
+    const brief = toCoworkBrief(sections);
+
+    assert.doesNotMatch(brief, /À me proposer/);
+    assert.doesNotMatch(brief, /habituels/);
+    assert.match(brief, /À acheter \(2 articles\) :/);
+  });
+
+  it("omet les articles déjà mis dans le panier", () => {
+    const skip = new Set([sections[0].items[0].key]);
+    const brief = toCoworkBrief(sections, { skip, habits });
+
+    assert.doesNotMatch(brief, /^Carottes/m);
+    assert.match(brief, /À acheter \(1 article\) :/);
   });
 });
 
