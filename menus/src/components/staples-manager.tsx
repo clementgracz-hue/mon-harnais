@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Settings2, Star, Trash2 } from "lucide-react";
+import { ClipboardPaste, Plus, Settings2, Star, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,10 +12,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input, Select } from "@/components/ui/input";
+import { Input, Select, Textarea } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AISLES, AISLE_EMOJI, aisleRank, guessAisle } from "@/lib/aisles";
 import { createClient } from "@/lib/supabase/client";
+import { parseStapleList } from "@/lib/staples";
 import type { Aisle, StapleProduct } from "@/lib/types/database";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +36,8 @@ export function StaplesManager({ staples, onChanged }: Props) {
   const [aisle, setAisle] = useState<Aisle | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pasted, setPasted] = useState("");
+  const [imported, setImported] = useState<string | null>(null);
 
   const effectiveAisle = aisle ?? guessAisle(name);
 
@@ -64,6 +67,55 @@ export function StaplesManager({ staples, onChanged }: Props) {
     setName("");
     setAisle(null);
     setPending(false);
+    await onChanged();
+  }
+
+  /**
+   * Collage en masse : la liste que Cowork rapporte du Drive, ou n'importe
+   * quelle liste recopiée. Les rayons sont devinés, les doublons écartés.
+   */
+  async function importList(event: React.FormEvent) {
+    event.preventDefault();
+    const { staples: parsed, duplicates } = parseStapleList(
+      pasted,
+      staples.map((staple) => staple.name),
+    );
+
+    if (parsed.length === 0) {
+      setImported(null);
+      setError(
+        duplicates.length > 0
+          ? "Tous ces produits sont déjà dans la liste."
+          : "Rien de lisible dans ce collage.",
+      );
+      return;
+    }
+
+    setPending(true);
+    setError(null);
+
+    const supabase = createClient();
+    const { error } = await supabase.from("staple_products").insert(
+      parsed.map((staple) => ({
+        name: staple.name,
+        category: staple.aisle,
+        is_frequent: true,
+      })),
+    );
+
+    setPending(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    setPasted("");
+    setImported(
+      `${parsed.length} produit${parsed.length > 1 ? "s" : ""} ajouté${parsed.length > 1 ? "s" : ""}` +
+        (duplicates.length > 0
+          ? ` · ${duplicates.length} déjà connu${duplicates.length > 1 ? "s" : ""}`
+          : ""),
+    );
     await onChanged();
   }
 
@@ -146,6 +198,35 @@ export function StaplesManager({ staples, onChanged }: Props) {
           <p className="text-xs text-muted-foreground">
             Rayon deviné d&apos;après le nom — modifiable.
           </p>
+        </form>
+
+        <form onSubmit={importList} className="mt-3 space-y-2 rounded-xl border p-3">
+          <Label htmlFor="staple-paste">Coller une liste</Label>
+          <Textarea
+            id="staple-paste"
+            rows={4}
+            value={pasted}
+            onChange={(event) => setPasted(event.target.value)}
+            placeholder={"Petits suisses\nCompote pomme sans sucre bio\nJus de citron bio"}
+          />
+          <Button
+            type="submit"
+            variant="outline"
+            className="w-full"
+            disabled={pending || !pasted.trim()}
+          >
+            <ClipboardPaste className="h-4 w-4" aria-hidden />
+            Ajouter la liste
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Un produit par ligne. Puces, numéros et quantités sont ignorés, les
+            rayons devinés, les doublons écartés.
+          </p>
+          {imported && (
+            <p role="status" className="text-xs font-medium text-primary">
+              {imported}
+            </p>
+          )}
         </form>
 
         {error && (

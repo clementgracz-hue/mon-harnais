@@ -300,6 +300,15 @@ describe("toCoworkBrief", () => {
     assert.match(brief, /ce que tu n'as pas trouvé/);
   });
 
+  it("demande de relever les habitudes gardées par le Drive", () => {
+    const brief = toCoworkBrief(sections, { habits });
+
+    assert.match(brief, /« mes favoris »/);
+    assert.match(brief, /propose\s*\n?\s*chacun avant de l'ajouter/);
+    // Ramenée sous une forme que l'application sait ravaler.
+    assert.match(brief, /un par ligne et sans\n\s*quantité/);
+  });
+
   it("reprend les préférences pour le choix des produits", () => {
     const brief = toCoworkBrief(sections, {
       habits,

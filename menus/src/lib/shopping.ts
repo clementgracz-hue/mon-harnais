@@ -459,9 +459,20 @@ export function toCoworkBrief(
 
   blocks.push(
     [
+      "Le Drive garde lui aussi mes habitudes — « mes favoris », « déjà",
+      "commandés », mes commandes précédentes. Parcours-les et signale-moi ce",
+      "que j'y rachète souvent et qui ne figure nulle part ci-dessous ; propose",
+      "chacun avant de l'ajouter.",
+    ].join("\n"),
+  );
+
+  blocks.push(
+    [
       "Préviens-moi dès que le panier est complet, et donne-moi alors :",
       "- ce que tu as remplacé, et par quoi ;",
-      "- ce que tu n'as pas trouvé.",
+      "- ce que tu n'as pas trouvé ;",
+      "- la liste des habitués repérés sur le Drive, un par ligne et sans",
+      "  quantité, pour que je la garde dans mon application.",
     ].join("\n"),
   );
 
