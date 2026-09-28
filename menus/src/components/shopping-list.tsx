@@ -22,8 +22,12 @@ import {
   countItems,
   preferenceNote,
   toDriveText,
+  COPY_FORMATS,
+  COPY_FORMAT_HINTS,
+  COPY_FORMAT_LABELS,
   PREFERENCES,
   PREFERENCE_LABELS,
+  type CopyFormat,
   type Preference,
   type RawItem,
   type ShoppingSource,
@@ -40,6 +44,9 @@ const SOURCE_ORDER: ShoppingSource[] = ["recette", "pense-bête", "récurrent"];
 
 /** Les préférences valent pour toutes les semaines, pas seulement celle-ci. */
 const PREFERENCES_KEY = "courses:preferences";
+
+/** Le format de copie dépend du Drive, pas de la semaine : il se retient. */
+const FORMAT_KEY = "courses:format";
 
 function ClosedNotice({ runId }: { runId: string }) {
   return (
@@ -74,6 +81,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
   );
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [preferences, setPreferences] = useState<Set<Preference>>(new Set());
+  const [format, setFormat] = useState<CopyFormat>("rayons");
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -93,6 +101,11 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
       setPreferences(new Set(PREFERENCES.filter((item) => saved.has(item))));
     }
 
+    const storedFormat = window.localStorage.getItem(FORMAT_KEY);
+    if (storedFormat && (COPY_FORMATS as readonly string[]).includes(storedFormat)) {
+      setFormat(storedFormat as CopyFormat);
+    }
+
     setHydrated(true);
   }, [storageKey]);
 
@@ -108,6 +121,10 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
     }
   }, [hydrated, preferences]);
 
+  useEffect(() => {
+    if (hydrated) window.localStorage.setItem(FORMAT_KEY, format);
+  }, [format, hydrated]);
+
   const sections = useMemo(
     () => consolidate(items.filter((item) => sources.has(item.source))),
     [items, sources],
@@ -120,6 +137,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
     const text = toDriveText(sections, {
       skip: checked,
       note: preferenceNote(preferences),
+      format,
     });
     try {
       await navigator.clipboard.writeText(text);
@@ -220,6 +238,37 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
   const note = preferenceNote(preferences);
 
   // Ce qu'on veut au rayon : la consigne part en tête du presse-papier.
+  // Le Drive n'ingère pas toujours le même texte : on choisit la forme.
+  const formatPicker = (
+    <div className="rounded-xl border p-3">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Format de la copie
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {COPY_FORMATS.map((option) => {
+          const active = format === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setFormat(option)}
+              aria-pressed={active}
+              className={cn(
+                "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "text-muted-foreground",
+              )}
+            >
+              {COPY_FORMAT_LABELS[option]}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">{COPY_FORMAT_HINTS[format]}</p>
+    </div>
+  );
+
   const preferenceBoxes = (
     <div className="rounded-xl border p-3">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -278,6 +327,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
         {done && <ClosedNotice runId={done} />}
         {filters}
         {preferenceBoxes}
+        {formatPicker}
         <p className="p-8 text-center text-sm text-muted-foreground">
           {everythingHidden
             ? "Aucune source sélectionnée : réactive un filtre ci-dessus."
@@ -291,6 +341,7 @@ export function ShoppingList({ items, storageKey, week, year, closedBy }: Props)
     <div className="space-y-4 p-4">
       {filters}
       {preferenceBoxes}
+      {formatPicker}
 
       <div className="sticky top-[calc(3.75rem+env(safe-area-inset-top))] z-20 flex items-center gap-2 rounded-xl border bg-background/95 p-3 backdrop-blur">
         <div className="flex-1">

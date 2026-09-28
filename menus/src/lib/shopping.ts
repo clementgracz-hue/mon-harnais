@@ -219,25 +219,96 @@ export function consolidate(items: RawItem[]): ShoppingSection[] {
 // ---------------------------------------------------------------------------
 
 /**
+ * Trois façons de sortir la liste, parce que le Drive ne se remplit pas
+ * toujours de la même manière :
+ *
+ * - `rayons` : groupée, avec les quantités — pour lire en saisissant à la main ;
+ * - `noms`   : un nom nu par ligne, sans quantité ni ponctuation — c'est ce
+ *   qu'attendent les champs d'ajout en masse, qui cherchent le libellé exact
+ *   et ne trouvent rien si la ligne porte un tiret, un emoji ou « 500 g » ;
+ * - `assistant` : une consigne suivie des quantités, pour un assistant à qui
+ *   on parle en français.
+ */
+export const COPY_FORMATS = ["rayons", "noms", "assistant"] as const;
+
+export type CopyFormat = (typeof COPY_FORMATS)[number];
+
+export const COPY_FORMAT_LABELS: Record<CopyFormat, string> = {
+  rayons: "Par rayon",
+  noms: "Noms seuls",
+  assistant: "Pour l'assistant",
+};
+
+export const COPY_FORMAT_HINTS: Record<CopyFormat, string> = {
+  rayons: "Groupée avec les quantités, pour saisir article par article.",
+  noms: "Un nom par ligne, rien d'autre : pour l'ajout en masse du Drive.",
+  assistant: "Une phrase et les quantités, pour Hopla ou un chatbot du Drive.",
+};
+
+/** Libellé tel qu'on le taperait dans une barre de recherche. */
+function plainName(name: string) {
+  return name
+    .replace(/[()[\]]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
  * Texte brut épuré : un article par ligne, prêt à être collé / recherché
  * article par article dans la barre de recherche du Drive.
  */
 export function toDriveText(
   sections: ShoppingSection[],
-  options: { withAisles?: boolean; skip?: Set<string>; note?: string } = {},
+  options: {
+    withAisles?: boolean;
+    skip?: Set<string>;
+    note?: string;
+    format?: CopyFormat;
+  } = {},
 ) {
-  const { withAisles = true, skip, note } = options;
+  const { skip, note, format = "rayons" } = options;
+  const withAisles = options.withAisles ?? format === "rayons";
   const blocks: string[] = [];
+
+  const kept = sections
+    .map((section) => ({
+      aisle: section.aisle,
+      items: section.items.filter((item) => !skip?.has(item.key)),
+    }))
+    .filter((section) => section.items.length > 0);
+
+  // Les champs d'ajout en masse cherchent un libellé : tout le reste — tiret,
+  // quantité, titre de rayon — fait échouer la correspondance. Les
+  // parenthèses aussi : « Bœuf (haché surgelé) » ne ressort pas, « Bœuf haché
+  // surgelé » si.
+  if (format === "noms") {
+    return kept
+      .flatMap((section) => section.items.map((item) => plainName(item.name)))
+      .join("\n");
+  }
 
   // L'en-tête part en tête du presse-papier : c'est la consigne qu'on relit
   // en choisissant les produits sur le Drive.
+  if (format === "assistant") {
+    const consigne = note?.trim()
+      ? `Ajoute ces produits à mon panier (${note.trim().replace(/^Préférences\s*:\s*/, "")}) :`
+      : "Ajoute ces produits à mon panier :";
+
+    return [
+      consigne,
+      ...kept.flatMap((section) =>
+        section.items.map((item) => {
+          const amount = item.amounts.join(" + ");
+          return amount ? `${item.name} — ${amount}` : item.name;
+        }),
+      ),
+    ].join("\n");
+  }
+
   if (note?.trim()) blocks.push(note.trim());
 
-  for (const section of sections) {
-    const items = section.items.filter((item) => !skip?.has(item.key));
-    if (items.length === 0) continue;
-
-    const lines = items.map((item) => {
+  for (const section of kept) {
+    const lines = section.items.map((item) => {
       const amount = item.amounts.join(" + ");
       return amount ? `- ${item.name} — ${amount}` : `- ${item.name}`;
     });

@@ -179,6 +179,65 @@ describe("toDriveText", () => {
   });
 });
 
+describe("formats de copie", () => {
+  const sections = consolidate([
+    recipeItem("Carottes", 500, "g", "Fruits & Légumes"),
+    recipeItem("Beurre", 250, "g", "Crémerie"),
+    recipeItem("Sel", null, null, "Épicerie salée"),
+  ]);
+
+  it("« noms seuls » ne sort que des libellés", () => {
+    const text = toDriveText(sections, { format: "noms", note: "Préférences : bio" });
+
+    assert.deepEqual(text.split("\n").sort(), ["Beurre", "Carottes", "Sel"]);
+    // Ni tiret, ni quantité, ni rayon, ni consigne : le champ d'ajout en
+    // masse ne cherche que le libellé.
+    assert.doesNotMatch(text, /[-—]|500|LÉGUMES|Préférences/);
+  });
+
+  it("« noms seuls » ouvre les parenthèses, qu'une recherche ne digère pas", () => {
+    const avecPrécision = consolidate([
+      recipeItem("Bœuf (haché surgelé)", 250, "g", "Surgelés"),
+      recipeItem("Salade (mélange)", 4, "poignée", "Fruits & Légumes"),
+    ]);
+    const text = toDriveText(avecPrécision, { format: "noms" });
+
+    assert.deepEqual(text.split("\n").sort(), [
+      "Bœuf haché surgelé",
+      "Salade mélange",
+    ]);
+  });
+
+  it("« noms seuls » respecte les articles déjà saisis", () => {
+    const skip = new Set([sections[0].items[0].key]);
+    const text = toDriveText(sections, { format: "noms", skip });
+
+    assert.doesNotMatch(text, /Carottes/);
+    assert.match(text, /Beurre/);
+  });
+
+  it("« assistant » ouvre par une consigne et garde les quantités", () => {
+    const text = toDriveText(sections, {
+      format: "assistant",
+      note: "Préférences : bio de préférence",
+    });
+    const [first, ...rest] = text.split("\n");
+
+    assert.equal(first, "Ajoute ces produits à mon panier (bio de préférence) :");
+    assert.ok(rest.includes("Carottes — 500 g"));
+    assert.ok(rest.includes("Sel"));
+  });
+
+  it("« assistant » se passe de préférences", () => {
+    const text = toDriveText(sections, { format: "assistant" });
+    assert.equal(text.split("\n")[0], "Ajoute ces produits à mon panier :");
+  });
+
+  it("« par rayon » reste le format par défaut", () => {
+    assert.equal(toDriveText(sections), toDriveText(sections, { format: "rayons" }));
+  });
+});
+
 describe("preferenceNote", () => {
   it("ne dit rien quand rien n'est coché", () => {
     assert.equal(preferenceNote([]), "");
