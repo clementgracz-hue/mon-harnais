@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { expiringSoon, pantryUsedBy, suggestDays, urgencyOf } from "@/lib/planning";
+import {
+  byUrgency,
+  expiringSoon,
+  pantryUsedBy,
+  suggestDays,
+  urgencyOf,
+} from "@/lib/planning";
 import { scaleQuantity, shoppingQuantity } from "@/lib/servings";
 import { daysUntil, formatExpiry, shelfLifeDays, suggestExpiry } from "@/lib/shelf-life";
 
@@ -122,6 +128,39 @@ describe("suggestDays", () => {
       plan.map((entry) => entry.day),
       ["dimanche", "dimanche", null, null],
     );
+  });
+});
+
+describe("byUrgency", () => {
+  const meals = [
+    { title: "Riz cantonais", dlc: null },
+    { title: "Nouilles sautées", dlc: "2026-08-08" },
+    { title: "Pâtes aux lardons", dlc: "2026-08-04" },
+    { title: "Avocado toast", dlc: null },
+  ];
+
+  const ordered = byUrgency(
+    meals,
+    (meal) => meal.dlc,
+    (meal) => meal.title,
+  );
+
+  it("met la date la plus proche en tête", () => {
+    assert.deepEqual(ordered.slice(0, 2).map((meal) => meal.title), [
+      "Pâtes aux lardons",
+      "Nouilles sautées",
+    ]);
+  });
+
+  it("repousse ce qui ne périme pas, par ordre alphabétique", () => {
+    assert.deepEqual(ordered.slice(2).map((meal) => meal.title), [
+      "Avocado toast",
+      "Riz cantonais",
+    ]);
+  });
+
+  it("ne touche pas au tableau d'origine", () => {
+    assert.equal(meals[0].title, "Riz cantonais");
   });
 });
 

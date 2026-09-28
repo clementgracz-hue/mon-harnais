@@ -7,8 +7,8 @@ import { useMemo, useState } from "react";
 import { Beef, CalendarClock, Check, Leaf, UtensilsCrossed } from "lucide-react";
 
 import { StarRating } from "@/components/star-rating";
-import { pantryUsedBy, type PantryEntry } from "@/lib/planning";
-import { DAY_CAPACITY, hasRoom, placeMeals } from "@/lib/schedule";
+import { byUrgency, pantryUsedBy, type PantryEntry } from "@/lib/planning";
+import { hasRoom } from "@/lib/schedule";
 import { formatExpiry } from "@/lib/shelf-life";
 import { createClient } from "@/lib/supabase/client";
 import { DAYS, type Day, type ShoppingRunRecipe } from "@/lib/types/database";
@@ -53,7 +53,17 @@ export function RunPlanner({
   const router = useRouter();
   const [rows, setRows] = useState(meals);
 
-  const { byDay, unplaced } = useMemo(() => placeMeals(rows), [rows]);
+  // Ce qui périme le plus tôt se cuisine le plus tôt : c'est tout l'ordre
+  // de cet écran. Le jour reste attribuable, il ne commande plus le tri.
+  const ordered = useMemo(
+    () =>
+      byUrgency(
+        rows,
+        (meal) => (meal.recipe_id ? (urgency[meal.recipe_id]?.expiresOn ?? null) : null),
+        (meal) => meal.title,
+      ),
+    [rows, urgency],
+  );
 
   async function setDay(meal: RunMeal, day: Day | null) {
     setRows((current) =>
@@ -148,45 +158,15 @@ export function RunPlanner({
   }
 
   return (
-    <div className="space-y-5">
-      {DAYS.map((day) => {
-        const placed = byDay.get(day) ?? [];
-        const free = DAY_CAPACITY[day] - placed.length;
+    <div className="space-y-3">
+      <h2 className="flex items-baseline justify-between px-0.5">
+        <span className="font-semibold">À cuisiner</span>
+        <span className="text-xs text-muted-foreground">
+          {rows.length} repas
+        </span>
+      </h2>
 
-        return (
-          <section key={day} className="space-y-2">
-            <h2 className="flex items-baseline justify-between px-0.5">
-              <span className="font-semibold capitalize">{day}</span>
-              <span className="text-xs text-muted-foreground">
-                {placed.length}/{DAY_CAPACITY[day]} repas
-              </span>
-            </h2>
-
-            {placed.map(card)}
-
-            {Array.from({ length: free }, (_, index) => (
-              <p
-                key={index}
-                className="rounded-xl border border-dashed px-3 py-4 text-center text-sm text-muted-foreground"
-              >
-                Libre
-              </p>
-            ))}
-          </section>
-        );
-      })}
-
-      {unplaced.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="flex items-baseline justify-between px-0.5">
-            <span className="font-semibold">À placer</span>
-            <span className="text-xs text-muted-foreground">
-              {unplaced.length} repas
-            </span>
-          </h2>
-          {unplaced.map(card)}
-        </section>
-      )}
+      {ordered.map(card)}
     </div>
   );
 }

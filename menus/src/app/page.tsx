@@ -2,11 +2,11 @@ import Link from "next/link";
 import { History, LogOut, ShoppingBasket } from "lucide-react";
 
 import { ExpiryAlerts } from "@/components/expiry-alerts";
+import { FridgeInventory } from "@/components/fridge-inventory";
 import { PageHeader } from "@/components/page-header";
 import { RunPlanner, type RunMeal } from "@/components/run-planner";
 import { Button } from "@/components/ui/button";
 import { urgencyOf } from "@/lib/planning";
-import { WEEK_CAPACITY } from "@/lib/schedule";
 import { createClient } from "@/lib/supabase/server";
 import type { PantryItem, ShoppingRun } from "@/lib/types/database";
 import { displayName } from "@/lib/user";
@@ -45,8 +45,7 @@ export default async function HomePage() {
     .from("pantry_items")
     .select("*")
     .eq("is_used", false)
-    .not("expires_on", "is", null)
-    .order("expires_on");
+    .order("expires_on", { nullsFirst: false });
 
   const fridge = (pantry ?? []) as PantryItem[];
 
@@ -86,8 +85,8 @@ export default async function HomePage() {
   return (
     <main className="pb-nav">
       <PageHeader
-        title={run ? `Semaine ${run.week_number}` : "Semaine"}
-        subtitle={`Nos repas · connecté en ${displayName(user)}`}
+        title="En cuisine"
+        subtitle={`Ce qu\u2019il reste \u00e0 cuisiner · connecté en ${displayName(user)}`}
         action={
           <div className="flex items-center">
             <Button
@@ -142,7 +141,7 @@ export default async function HomePage() {
               </span>
               <span className="block text-xs text-muted-foreground">
                 Semaine {run.week_number} · {run.item_count} articles ·{" "}
-                {meals.length} repas à cuisiner sur {WEEK_CAPACITY} créneaux
+                {meals.length} repas à cuisiner
                 {carriedOver > 0 &&
                   ` · dont ${carriedOver} d'une commande précédente`}
               </span>
@@ -168,6 +167,8 @@ export default async function HomePage() {
             currentRunId={run.id}
             author={displayName(user)}
           />
+
+          <FridgeInventory items={fridge} />
         </div>
       )}
     </main>

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   BookOpen,
-  CalendarDays,
+  ChefHat,
   ShoppingCart,
   StickyNote,
   type LucideIcon,
@@ -23,7 +23,7 @@ type NavItem = {
 };
 
 const ITEMS: NavItem[] = [
-  { href: "/", label: "Semaine", icon: CalendarDays },
+  { href: "/", label: "En cuisine", icon: ChefHat },
   { href: "/pense-bete", label: "Pense-bête", icon: StickyNote, badge: "wishlist" },
   { href: "/recettes", label: "Recettes", icon: BookOpen },
   { href: "/courses", label: "Courses", icon: ShoppingCart },

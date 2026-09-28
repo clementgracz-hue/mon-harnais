@@ -49,6 +49,27 @@ export function pantryUsedBy(
   );
 }
 
+/**
+ * Ordonne ce qui attend d'être cuisiné : la DLC la plus proche d'abord, puis
+ * ce qui ne périme pas, par titre. C'est l'ordre de l'onglet « En cuisine » —
+ * on cuisine ce qui ne peut plus attendre.
+ */
+export function byUrgency<T>(
+  entries: T[],
+  urgencyOf: (entry: T) => string | null,
+  titleOf: (entry: T) => string,
+) {
+  return [...entries].sort((a, b) => {
+    const left = urgencyOf(a);
+    const right = urgencyOf(b);
+
+    if (left && right && left !== right) return left.localeCompare(right);
+    if (left && !right) return -1;
+    if (right && !left) return 1;
+    return titleOf(a).localeCompare(titleOf(b), "fr");
+  });
+}
+
 /** Pour chaque recette, la DLC la plus proche parmi ses ingrédients. */
 export function urgencyOf(
   recipes: PlannedRecipe[],
